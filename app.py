@@ -1,16 +1,9 @@
-import os, json
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
-from werkzeug.utils import secure_filename
-from jinja2 import ChoiceLoader, FileSystemLoader
+import os
+import json
+from flask import Flask, request, redirect, url_for, session, send_from_directory, render_template_string
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-2026-json-master')
-
-app.jinja_loader = ChoiceLoader([
-    FileSystemLoader(os.path.join(app.root_path, 'templates')),
-    FileSystemLoader(os.path.join(app.root_path, 'templates', 'templates')),
-    FileSystemLoader(app.root_path)
-])
+app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-2026-fixed-master-key')
 
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/opt/render/project/src/static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -41,6 +34,26 @@ load_data(CENTERS_FILE)
 load_data(USERS_FILE)
 load_data(DOCS_FILE)
 
+# CRASH-PROOF TEMPLATE LOADER ENGINE: Reads raw text data directly to bypass folder path failures
+def crash_proof_render(file_name, **context):
+    search_paths = [
+        os.path.join(app.root_path, file_name),
+        os.path.join(app.root_path, 'templates', file_name),
+        os.path.join(app.root_path, 'templates', 'templates', file_name)
+    ]
+    raw_content = ""
+    for path in search_paths:
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                raw_content = f.read()
+            break
+    if not raw_content:
+        return f"<div style='font-family:sans-serif; text-align:center; padding:50px;'><h2>Critical Setup Error: '{file_name}' not found on GitHub. Check your folders layout.</h2></div>", 404
+    return render_template_string(raw_content, **context)
+
+# ----------------------------------------------------
+# VISUAL CLIENT INTAKE FORM SYSTEM CONTROLLERS
+# ----------------------------------------------------
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/register', methods=['GET', 'POST'])
 def public_registration():
@@ -77,7 +90,7 @@ def public_registration():
         
     all_centers = load_data(CENTERS_FILE)
     functional_centers = [c for c in all_centers if c.get('status') == 'Functional']
-    return render_template('public_form.html', centers=functional_centers)
+    return crash_proof_render('public_form.html', centers=functional_centers)
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -95,7 +108,7 @@ def admin_login():
                 session['logged_in'] = True
                 session['assigned_center'] = u.get('center_name')
                 return redirect(url_for('admin_dashboard'))
-    return render_template('admin_login.html')
+    return crash_proof_render('admin_login.html')
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
@@ -135,7 +148,7 @@ def admin_dashboard():
             if isinstance(fields, dict):
                 for k in fields.keys(): extra_keys.add(k)
 
-    return render_template('dashboard.html', trainees=view_trainees, centers=view_centers, extra_keys=list(extra_keys), total_trainees=total_trainees, trade_metrics=trade_metrics, ddo_accounts=ddo_accounts, all_centers_list=all_centers, docs_to_me=docs_to_me, docs_from_me=docs_from_me)
+    return crash_proof_render('dashboard.html', trainees=view_trainees, centers=view_centers, extra_keys=list(extra_keys), total_trainees=total_trainees, trade_metrics=trade_metrics, ddo_accounts=ddo_accounts, all_centers_list=all_centers, docs_to_me=docs_to_me, docs_from_me=docs_from_me)
 
 @app.route('/admin/add-center', methods=['POST'])
 def add_center():
