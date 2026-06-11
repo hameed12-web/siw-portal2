@@ -1,193 +1,204 @@
 import os
 import json
-import sqlite3
-from flask import Flask, request, redirect, url_for, session, send_from_directory, render_template_string
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-2026-final-secure-key')
+app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-2026-json-master-v3')
 
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/opt/render/project/src/static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-DB_PATH = 'database.db'
+DATA_DIR = os.environ.get('DATA_DIR', '/opt/render/project/src/data_store')
+os.makedirs(DATA_DIR, exist_ok=True)
 
-def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+TRAINEES_FILE = os.path.join(DATA_DIR, 'trainees.json')
+CENTERS_FILE = os.path.join(DATA_DIR, 'centers.json')
+USERS_FILE = os.path.join(DATA_DIR, 'users.json')
+DOCS_FILE = os.path.join(DATA_DIR, 'docs.json')
 
-def init_db():
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS trainees (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, center_name TEXT, full_name TEXT, father_name TEXT, 
-            cnic_number TEXT UNIQUE, phone_number TEXT UNIQUE, session_cohort TEXT, email_address TEXT, 
-            course_module TEXT, gender TEXT, local_status TEXT, vendor_id TEXT UNIQUE, iban TEXT UNIQUE, 
-            stipend TEXT, wallet_number TEXT
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS training_centers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, ddo_code TEXT NOT NULL UNIQUE, 
-            center_name TEXT NOT NULL UNIQUE, status TEXT NOT NULL, sector TEXT NOT NULL, 
-            ddo_name TEXT NOT NULL, extra_columns TEXT DEFAULT '{}'
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS ddo_users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, center_name TEXT UNIQUE, username TEXT UNIQUE, password TEXT
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS documents (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, direction TEXT, filename TEXT, center_name TEXT, uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    conn.close()
+def load_data(file_path):
+    if not os.path.exists(file_path):
+        with open(file_path, 'w') as f: json.dump([], f)
+    try:
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+            return data if isinstance(data, list) else []
+    except:
+        return []
 
-init_db()
+def save_data(file_path, data):
+    with open(file_path, 'w') as f: json.dump(data if isinstance(data, list) else [], f, indent=4)
 
-# ----------------------------------------------------
-# RAW EMBEDDED COMPONENT LAYOUT STRINGS
-# ----------------------------------------------------
+load_data(TRAINEES_FILE)
+load_data(CENTERS_FILE)
+load_data(USERS_FILE)
+load_data(DOCS_FILE)
 
-PUBLIC_FORM_HTML = """
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Small Industries Wing, Balochistan</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0f172a; margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-        .wrapper { width: 100%; max-width: 850px; background: #ffffff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; }
-        .branding-header { background: #004d26; color: #ffffff; padding: 35px 20px; text-align: center; }
-        .branding-header h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
-        .accent-strip { background: #d4af37; height: 5px; }
-        .form-body { padding: 40px; }
-        .form-section-title { font-size: 14px; color: #004d26; font-weight: bold; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 30px; margin-bottom: 18px; text-transform: uppercase; }
-        .input-row { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 15px; }
-        @media(min-width: 768px) { .input-row { grid-template-columns: 1fr 1fr; } }
-        .field-box { display: flex; flex-direction: column; }
-        .field-box label { font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #34495e; text-transform: uppercase; }
-        .field-box input, .field-box select { padding: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; background-color: #f8fafc; }
-        .btn-register { background: #004d26; color: #fff; border: none; padding: 15px; border-radius: 4px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; text-transform: uppercase; }
-        .gateway-footer { text-align: center; margin-top: 40px; padding-top: 25px; border-top: 1px solid #e2e8f0; }
-        .gateway-footer a { background: #1e293b; color: #ffffff; text-decoration: none; font-weight: 600; padding: 12px 24px; border-radius: 4px; font-size: 13px; text-transform: uppercase; display: inline-block; }
-    </style>
-</head>
-<body>
-<div class="wrapper">
-    <div class="branding-header">
-        <h1>Small Industries Wing, Balochistan</h1>
-        <p>National Trainee Enrollment & Registration Portal</p>
-    </div>
-    <div class="accent-strip"></div>
-    <form class="form-body" method="POST" action="/">
-        <div class="form-section-title">A. CENTER ALLOCATION DETAILS</div>
-        <div class="input-row">
-            <div class="field-box" style="grid-column: span 2;">
-                <label>Center / DDO Unit Name</label>
-                <select name="center_name" required>
-                    <option value="">-- Choose Assigned Location --</option>
-                    {% for item in centers %}
-                    <option value="{{ item.center_name }}">{{ item.center_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-        <div class="form-section-title">B. PERSONAL PROFILE PARTICULARS</div>
-        <div class="input-row">
-            <div class="field-box"><label>Full Name</label><input type="text" name="full_name" required></div>
-            <div class="field-box"><label>Father Name</label><input type="text" name="father_name" required></div>
-        </div>
-        <div class="input-row">
-            <div class="field-box"><label>CNIC Number</label><input type="text" name="cnic_number" required></div>
-            <div class="field-box"><label>Mobile Number</label><input type="text" name="phone_number" required></div>
-        </div>
-        <div class="input-row">
-            <div class="field-box"><label>Session Batch Cohort</label><input type="text" name="session_cohort" required></div>
-            <div class="field-box"><label>Email Address</label><input type="email" name="email_address" required></div>
-        </div>
-        <div class="input-row" style="grid-template-columns: 1fr;">
-            <div class="field-box"><label>Assigned Course Module / Trade</label><input type="text" name="course_module" required></div>
-        </div>
-        <div class="form-section-title">C. STATUS & DEMOGRAPHICS</div>
-        <div class="input-row">
-            <div class="field-box">
-                <label>Gender</label>
-                <select name="gender" required>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-            </div>
-            <div class="field-box"><label>Local Status</label><input type="text" name="local_status" required></div>
-        </div>
-        <div class="form-section-title">D. FINANCIAL DISBURSEMENT ACCOUNTS</div>
-        <div class="input-row">
-            <div class="field-box"><label>Vendor ID</label><input type="text" name="vendor_id" required></div>
-            <div class="field-box"><label>Bank Account Number (IBAN)</label><input type="text" name="iban" required></div>
-        </div>
-        <div class="input-row">
-            <div class="field-box"><label>Monthly Stipend</label><input type="text" name="stipend"></div>
-            <div class="field-box"><label>Wallet Number</label><input type="text" name="wallet_number"></div>
-        </div>
-        <button type="submit" class="btn-register">Submit Enrollment Form</button>
-        <div class="gateway-footer">
-            <a href="/admin/login">🛡️ ACCESS ADMIN WORKSPACE / RECORDS CONTROL PANEL</a>
-        </div>
-    </form>
-</div>
-</body>
-</html>
-"""
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
+def public_registration():
+    if request.method == 'POST':
+        trainees = load_data(TRAINEES_FILE)
+        cnic = request.form.get('cnic_number', '').strip()
+        phone = request.form.get('phone_number', '').strip()
+        vendor = request.form.get('vendor_id', '').strip()
+        iban = request.form.get('iban', '').strip()
+        
+        error_msg = None
+        for t in trainees:
+            if t.get('cnic_number') == cnic:
+                error_msg = "Submission Denied: This CNIC Number is already registered."
+                break
+            if t.get('phone_number') == phone:
+                error_msg = "Submission Denied: This Mobile Number is already registered."
+                break
+            if vendor and t.get('vendor_id') == vendor:
+                error_msg = "Submission Denied: This Vendor ID is already registered."
+                break
+            if iban and t.get('iban') == iban:
+                error_msg = "Submission Denied: This Bank IBAN Account Number is already registered."
+                break
+                
+        if error_msg:
+            return f"<div style='color:red; font-family:sans-serif; text-align:center; padding:50px;'><h2>{error_msg}</h2><br><a href='/'>Return to Form</a></div>"
 
-ADMIN_LOGIN_HTML = """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Secure Administrative Login Gateway</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0f172a; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .login-card { background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 420px; }
-        h2 { color: #0f172a; margin: 0 0 15px 0; font-size: 20px; text-transform: uppercase; text-align: center; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; }
-        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; background: #f8fafc; }
-        .btn-verify { background: #1e293b; color: white; text-transform: uppercase; font-weight: bold; border: none; width: 100%; padding: 14px; border-radius: 4px; cursor: pointer; }
-    </style>
-</head>
-<body>
-<div class="login-card">
-    <h2>Secure Gateway Login</h2>
-    <form method="POST" action="/admin/login">
-        <div class="form-group">
-            <label>Username ID</label>
-            <input type="text" name="username" required>
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" required>
-        </div>
-        <button type="submit" class="btn-verify">Verify Identity</button>
-    </form>
-</div>
-</body>
-</html>
-"""
+        next_id = len(trainees) + 1
+        new_trainee = {
+            "id": next_id,
+            "center_name": request.form.get('center_name'),
+            "full_name": request.form.get('full_name'),
+            "father_name": request.form.get('father_name'),
+            "cnic_number": cnic,
+            "phone_number": phone,
+            "session_cohort": request.form.get('session_cohort'),
+            "email_address": request.form.get('email_address'),
+            "course_module": request.form.get('course_module'),
+            "gender": request.form.get('gender'),
+            "local_status": request.form.get('local_status'),
+            "vendor_id": vendor if vendor else None,
+            "iban": iban if iban else None,
+            "stipend": request.form.get('stipend'),
+            "wallet_number": request.form.get('wallet_number')
+        }
+        trainees.append(new_trainee)
+        save_data(TRAINEES_FILE, trainees)
+        return "<div style='color:green; font-family:sans-serif; text-align:center; padding:50px;'><h2>Trainee Enrolled Successfully!</h2><br><a href='/'>Go Back Home</a></div>"
+        
+    all_centers = load_data(CENTERS_FILE)
+    functional_centers = [c for c in all_centers if c.get('status') == 'Functional']
+    return render_template('public_form.html', centers=functional_centers)
 
-DASHBOARD_HTML = """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Admin Dashboard Control Command Portal</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0f172a; margin: 0; padding-bottom: 60px; color: #1e293b; }
-        .navbar { background: #1e293b; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; border-bottom: 3px solid #d4af37; }
-        .navbar h2 { margin: 0; font-size: 16px; text-transform: uppercase; }
-        .navbar span { color: #d4af37; }
-        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
-        .metrics-board { display: grid; grid-template-columns: 1fr 3fr; gap: 20px; margin-bottom: 30px; }
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+        if username == "admin" and password == "protected123":
+            session['user_role'] = 'CENTRAL_ADMIN'
+            session['logged_in'] = True
+            return redirect(url_for('admin_dashboard'))
+        users = load_data(USERS_FILE)
+        for u in users:
+            if u.get('username') == username and u.get('password') == password:
+                session['user_role'] = 'DDO_USER'
+                session['logged_in'] = True
+                session['assigned_center'] = u.get('center_name')
+                return redirect(url_for('admin_dashboard'))
+    return render_template('admin_login.html')
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if not session.get('logged_in'):
+        return redirect(url_for('admin_login'))
+    role = session.get('user_role')
+    
+    all_trainees = load_data(TRAINEES_FILE)
+    all_centers = load_data(CENTERS_FILE)
+    all_docs = load_data(DOCS_FILE)
+    all_users = load_data(USERS_FILE)
+    
+    if role == 'DDO_USER':
+        target = session.get('assigned_center')
+        view_trainees = [t for t in all_trainees if t.get('center_name') == target]
+        view_centers = [c for c in all_centers if c.get('center_name') == target]
+        docs_to_me = [d for d in all_docs if d.get('direction') == 'directorate_to_centers']
+        docs_from_me = [d for d in all_docs if d.get('direction') == 'centers_to_directorate' and d.get('center_name') == target]
+        ddo_accounts = []
+    else:
+        view_trainees = all_trainees
+        view_centers = all_centers
+        docs_to_me = [d for d in all_docs if d.get('direction') == 'directorate_to_centers']
+        docs_from_me = [d for d in all_docs if d.get('direction') == 'centers_to_directorate']
+        ddo_accounts = all_users
+
+    total_trainees = len(view_trainees) if isinstance(view_trainees, list) else 0
+    trade_metrics = {}
+    if isinstance(view_trainees, list):
+        for t in view_trainees:
+            trade = t.get('course_module', 'Unassigned')
+            trade_metrics[trade] = trade_metrics.get(trade, 0) + 1
+
+    extra_keys = set()
+    if isinstance(view_centers, list):
+        for c in view_centers:
+            fields = c.get('extra_fields_data', {})
+            if isinstance(fields, dict):
+                for k in fields.keys(): extra_keys.add(k)
+
+    return render_template('dashboard.html', trainees=view_trainees, centers=view_centers, extra_keys=list(extra_keys), total_trainees=total_trainees, trade_metrics=trade_metrics, ddo_accounts=ddo_accounts, all_centers_list=all_centers, docs_to_me=docs_to_me, docs_from_me=docs_from_me)
+
+@app.route('/admin/add-center', methods=['POST'])
+def add_center():
+    if not session.get('logged_in') or session.get('user_role') != 'CENTRAL_ADMIN':
+        return "Unauthorized", 403
+    centers = load_data(CENTERS_FILE)
+    ddo_code = request.form.get('ddo_code')
+    center_name = request.form.get('center_name')
+    status = request.form.get('status')
+    sector = request.form.get('sector')
+    ddo_name = request.form.get('ddo_name')
+    
+    payload = {k: v for k, v in request.form.items() if k not in ['ddo_code', 'center_name', 'status', 'sector', 'ddo_name']}
+    centers.append({"ddo_code": ddo_code, "center_name": center_name, "status": status, "sector": sector, "ddo_name": ddo_name, "extra_fields_data": payload})
+    save_data(CENTERS_FILE, centers)
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/create-ddo-user', methods=['POST'])
+def create_ddo_user():
+    if not session.get('logged_in') or session.get('user_role') != 'CENTRAL_ADMIN':
+        return "Unauthorized", 403
+    users = load_data(USERS_FILE)
+    users.append({"center_name": request.form.get('center_name'), "username": request.form.get('ddo_username', '').strip(), "password": request.form.get('ddo_password', '').strip()})
+    save_data(USERS_FILE, users)
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/upload-document', methods=['POST'])
+def upload_document():
+    if not session.get('logged_in'):
+        return redirect(url_for('admin_login'))
+    direction = request.form.get('channel_direction')
+    file = request.files.get('vault_file')
+    if file and file.filename != '':
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        center_name = session.get('assigned_center', 'Directorate Desk') if session.get('user_role') == 'DDO_USER' else request.form.get('target_center', 'Global Desk')
+        docs = load_data(DOCS_FILE)
+        docs.append({"direction": direction, "filename": filename, "center_name": center_name})
+        save_data(DOCS_FILE, docs)
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/download-file/<filename>')
+def download_file(filename):
+    if not session.get('logged_in'):
+        return redirect(url_for('admin_login'))
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.clear()
+    return redirect(url_for('public_registration'))
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
