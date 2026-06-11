@@ -57,7 +57,6 @@
 
 <div class="container">
 
-    <!-- DATA CALCULATION BOARD LAYOUT CONTAINER -->
     <div class="metrics-board">
         <div class="calc-card">
             <h3>Total Trainees Enrolled</h3>
@@ -76,7 +75,6 @@
         </div>
     </div>
 
-    <!-- MAIN CENTERS DIRECTORY CONFIGURATION PANEL MODULE -->
     <div class="section-box">
         <div class="section-header">
             <span>🏠 Affiliated Training Centers Directory Index</span>
@@ -110,7 +108,7 @@
                 <thead>
                     <tr>
                         <th>S.No</th><th>DDO Code</th><th>Name of Center</th><th>Functional/Non-Functional</th><th>Govt/Private</th><th>DDO Name</th>
-                        {% for k in extra_keys %}<th>{{ k }}</th>{% endfor %}
+                        {% for k in extra_keys %}<th>{{ k.upper() }}</th>{% endfor %}
                     </tr>
                 </thead>
                 <tbody>
@@ -119,15 +117,7 @@
                         <td>{{ loop.index }}</td><td><strong>{{ item.ddo_code }}</strong></td><td>{{ item.center_name }}</td>
                         <td><span class="badge {{ 'badge-active' if item.status == 'Functional' else 'badge-inactive' }}">{{ item.status }}</span></td>
                         <td>{{ item.sector }}</td><td>{{ item.ddo_name }}</td>
-                        {% for k in extra_keys %}
-                        <td>
-                            {% if item.get('extra_fields_data') %}
-                                {{ item.get('extra_fields_data').get(k, '-') }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>
-                        {% endfor %}
+                        {% for k in extra_keys %}<td>{{ item.extra_fields_data.get(k, '-') }}</td>{% endfor %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -135,7 +125,6 @@
         </div>
     </div>
 
-    <!-- INTER-COMMUNICATION OFFICIAL DOCUMENT VAULT FLOW LAYOUT CORRESPONDENCE PANEL -->
     <div class="section-box">
         <div class="section-header">📂 Inter-Communication Official Correspondence Document Vault</div>
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
@@ -143,3 +132,11 @@
             <div style="background:#f8fafc; padding:15px; border-radius:6px; border:1px dashed #cbd5e1;">
                 <h4 style="margin:0 0 12px 0; font-size:12px; text-transform:uppercase; color:#004d26;">📁 Channel 1: From Directorate to Training Centers</h4>
                 {% if session.get('user_role') == 'CENTRAL_ADMIN' %}
+                <form method="POST" action="/admin/upload-document" enctype="multipart/form-data" style="display:flex; gap:10px; margin-bottom:15px;">
+                    <input type="hidden" name="channel_direction" value="directorate_to_centers">
+                    <input type="file" name="vault_file" required style="font-size:11px;">
+                    <button type="submit" class="btn-success" style="padding:4px 10px;">Dispatch</button>
+                </form>
+                {% endif %}
+                <div class="table-responsive">
+                    <table>
