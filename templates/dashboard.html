@@ -30,7 +30,7 @@
         .form-inline label { font-size: 11px; font-weight: bold; margin-bottom: 4px; display: block; color: #475569; text-transform: uppercase; }
         .form-inline input, .form-inline select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; }
         
-        .btn-success { background: #004d26; color: white; border: none; padding: 9px 18px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; text-transform: uppercase; width: 100%; text-align: center; }
+        .btn-success { background: #004d26; color: white; border: none; padding: 9px 18px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; text-transform: uppercase; text-align: center; }
         .btn-add-col { background: #1e293b; color: white; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; border: 1px solid #475569; }
         .btn-export { background: #d4af37; color: #1e293b; font-weight: bold; padding: 8px 14px; border-radius: 4px; font-size: 11px; text-transform: uppercase; border: none; cursor: pointer; }
         .btn-download-file { background: #2563eb; color: white; text-decoration: none; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; }
@@ -57,7 +57,7 @@
 
 <div class="container">
 
-    <!-- DATA CALCULATION BOARD LAYOUT CONTAINER -->
+    <!-- TRACKING METRICS ENGINE CALCULATIONS DISPLAY BOARD -->
     <div class="metrics-board">
         <div class="calc-card">
             <h3>Total Trainees Enrolled</h3>
@@ -76,7 +76,7 @@
         </div>
     </div>
 
-    <!-- MAIN CENTERS DIRECTORY CONFIGURATION PANEL MODULE -->
+    <!-- MAIN CENTERS DIRECTORY MODULE -->
     <div class="section-box">
         <div class="section-header">
             <span>🏠 Affiliated Training Centers Directory Index</span>
@@ -100,7 +100,7 @@
                 <div><label>Status</label><select name="status"><option value="Functional">Functional</option><option value="Non-Functional">Non-Functional</option></select></div>
                 <div><label>Sector</label><select name="sector"><option value="Govt">Govt</option><option value="Private">Private</option></select></div>
                 <div><label>DDO Name</label><input type="text" name="ddo_name" required></div>
-                <button type="submit" class="btn-success" style="height:35px;">Save Center</button>
+                <button type="submit" class="btn-success" style="height:35px; padding: 0 15px; width: auto;">Save Center</button>
             </div>
         </form>
         {% endif %}
@@ -110,7 +110,7 @@
                 <thead>
                     <tr>
                         <th>S.No</th><th>DDO Code</th><th>Name of Center</th><th>Functional/Non-Functional</th><th>Govt/Private</th><th>DDO Name</th>
-                        {% for k in extra_keys %}<th>{{ k.upper() }}</th>{% endfor %}
+                        {% for k in extra_keys %}<th>{{ k }}</th>{% endfor %}
                     </tr>
                 </thead>
                 <tbody>
