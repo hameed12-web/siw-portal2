@@ -110,7 +110,7 @@
                 <thead>
                     <tr>
                         <th>S.No</th><th>DDO Code</th><th>Name of Center</th><th>Functional/Non-Functional</th><th>Govt/Private</th><th>DDO Name</th>
-                        {% for k in extra_keys %}<th>{{ k|upper }}</th>{% endfor %}
+                        {% for k in extra_keys %}<th>{{ k.upper() }}</th>{% endfor %}
                     </tr>
                 </thead>
                 <tbody>
