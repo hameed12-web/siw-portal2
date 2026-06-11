@@ -5,9 +5,8 @@ from werkzeug.utils import secure_filename
 from jinja2 import ChoiceLoader, FileSystemLoader
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-2026-json-master')
+app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-clean-2026')
 
-# SMART COMPONENT PATH RESOLVER: Forces Flask to find your template layouts anywhere
 app.jinja_loader = ChoiceLoader([
     FileSystemLoader(os.path.join(app.root_path, 'templates')),
     FileSystemLoader(os.path.join(app.root_path, 'templates', 'templates')),
@@ -37,16 +36,14 @@ def load_data(file_path):
         return []
 
 def save_data(file_path, data):
-    with open(file_path, 'w') as f: json.dump(data if isinstance(data, list) else [], f, indent=4)
+    with open(file_path, 'w') as f:
+        json.dump(data if isinstance(data, list) else [], f, indent=4)
 
 load_data(TRAINEES_FILE)
 load_data(CENTERS_FILE)
 load_data(USERS_FILE)
 load_data(DOCS_FILE)
 
-# ----------------------------------------------------
-# VISUAL CLIENT INTAKE WEB-PORTAL CONTROLLERS
-# ----------------------------------------------------
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/register', methods=['GET', 'POST'])
 def public_registration():
@@ -57,38 +54,47 @@ def public_registration():
         vendor = request.form.get('vendor_id', '').strip()
         iban = request.form.get('iban', '').strip()
         
-        # Enforce unique fields criteria smoothly on public submission inputs
         error_msg = None
         for t in trainees:
-            if t.get('cnic_number') == cnic: error_msg = "Submission Denied: CNIC already registered."
-            if t.get('phone_number') == phone: error_msg = "Submission Denied: Mobile Number already registered."
-            if vendor and t.get('vendor_id') == vendor: error_msg = "Submission Denied: Vendor ID already registered."
-            if iban and t.get('iban') == iban: error_msg = "Submission Denied: Bank IBAN Account Number already registered."
+            if t.get('cnic_number') == cnic:
+                error_msg = "Submission Denied: CNIC Number is already registered."
+            if t.get('phone_number') == phone:
+                error_msg = "Submission Denied: Mobile Contact Number is already registered."
+            if vendor and t.get('vendor_id') == vendor:
+                error_msg = "Submission Denied: Vendor ID is already registered."
+            if iban and t.get('iban') == iban:
+                error_msg = "Submission Denied: Bank IBAN Account Number is already registered."
             if error_msg: break
                 
         if error_msg:
-            return f"<div style='color:red; font-family:sans-serif; text-align:center; padding:50px;'><h2>{error_msg}</h2><br><a href='/'>Return to Form</a></div>"
+            return "<div style='color:red; font-family:sans-serif; text-align:center; padding:50px;'><h2>" + error_msg + "</h2><br><a href='/'>Return to Form</a></div>"
 
         next_id = len(trainees) + 1
         new_trainee = {
-            "id": next_id, "center_name": request.form.get('center_name'), "full_name": request.form.get('full_name'),
-            "father_name": request.form.get('father_name'), "cnic_number": cnic, "phone_number": phone,
-            "session_cohort": request.form.get('session_cohort'), "email_address": request.form.get('email_address'),
-            "course_module": request.form.get('course_module'), "gender": request.form.get('gender'),
-            "local_status": request.form.get('local_status'), "vendor_id": vendor if vendor else None,
-            "iban": iban if iban else None, "stipend": request.form.get('stipend'), "wallet_number": request.form.get('wallet_number')
+            "id": next_id,
+            "center_name": request.form.get('center_name'),
+            "full_name": request.form.get('full_name'),
+            "father_name": request.form.get('father_name'),
+            "cnic_number": cnic,
+            "phone_number": phone,
+            "session_cohort": request.form.get('session_cohort'),
+            "email_address": request.form.get('email_address'),
+            "course_module": request.form.get('course_module'),
+            "gender": request.form.get('gender'),
+            "local_status": request.form.get('local_status'),
+            "vendor_id": vendor if vendor else None,
+            "iban": iban if iban else None,
+            "stipend": request.form.get('stipend'),
+            "wallet_number": request.form.get('wallet_number')
         }
         trainees.append(new_trainee)
         save_data(TRAINEES_FILE, trainees)
-        return "<div style='color:green; font-family:sans-serif; text-align:center; padding:50px;'><h2>Trainee Enrolled Successfully!</h2><br><a href='/'>Go Back Home</a></div>"
+        return "<div style='color:green; font-family:sans-serif; text-align:center; padding:50px;'><h2>Trainee Registered Successfully!</h2><br><a href='/'>Go Back Home</a></div>"
         
     all_centers = load_data(CENTERS_FILE)
     functional_centers = [c for c in all_centers if c.get('status') == 'Functional']
     return render_template('public_form.html', centers=functional_centers)
 
-# ----------------------------------------------------
-# ADMIN ACCESS PORTAL AUTH VALIDATOR HOOKS
-# ----------------------------------------------------
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
@@ -107,9 +113,6 @@ def admin_login():
                 return redirect(url_for('admin_dashboard'))
     return render_template('admin_login.html')
 
-# ----------------------------------------------------
-# CENTRAL DIRECTORATE ADMIN COMMAND CONTROL HUB
-# ----------------------------------------------------
 @app.route('/admin/dashboard')
 def admin_dashboard():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
