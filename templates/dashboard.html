@@ -36,7 +36,7 @@
         .btn-download-file { background: #2563eb; color: white; text-decoration: none; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; }
 
         .table-responsive { overflow-x: auto; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; background: #ffffff; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
         th { background: #004d26; color: white; padding: 11px 10px; text-transform: uppercase; font-size: 11px; border: 1px solid #003318; }
         td { padding: 10px; border: 1px solid #f1f2f6; color: #334155; }
         tr:nth-child(even) { background-color: #fcfcfc; }
@@ -132,7 +132,6 @@
         <div class="section-header">📂 Inter-Communication Two-Way Official Correspondence Document Vault</div>
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
             
-            <!-- Channel 1 Section Box Component -->
             <div style="background:#f8fafc; padding:20px; border-radius:6px; border:1px dashed #cbd5e1;">
                 <h4 style="margin:0 0 12px 0; font-size:12px; text-transform:uppercase; color:#004d26;">📁 Channel 1: From Directorate to Training Centers</h4>
                 {% if session.get('user_role') == 'CENTRAL_ADMIN' %}
