@@ -1,11 +1,10 @@
-import os
-import json
+import os, json
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from werkzeug.utils import secure_filename
 from jinja2 import ChoiceLoader, FileSystemLoader
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-clean-2026')
+app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-2026-json-master')
 
 app.jinja_loader = ChoiceLoader([
     FileSystemLoader(os.path.join(app.root_path, 'templates')),
@@ -32,12 +31,10 @@ def load_data(file_path):
         with open(file_path, 'r') as f:
             data = json.load(f)
             return data if isinstance(data, list) else []
-    except:
-        return []
+    except: return []
 
 def save_data(file_path, data):
-    with open(file_path, 'w') as f:
-        json.dump(data if isinstance(data, list) else [], f, indent=4)
+    with open(file_path, 'w') as f: json.dump(data if isinstance(data, list) else [], f, indent=4)
 
 load_data(TRAINEES_FILE)
 load_data(CENTERS_FILE)
@@ -56,40 +53,27 @@ def public_registration():
         
         error_msg = None
         for t in trainees:
-            if t.get('cnic_number') == cnic:
-                error_msg = "Submission Denied: CNIC Number is already registered."
-            if t.get('phone_number') == phone:
-                error_msg = "Submission Denied: Mobile Contact Number is already registered."
-            if vendor and t.get('vendor_id') == vendor:
-                error_msg = "Submission Denied: Vendor ID is already registered."
-            if iban and t.get('iban') == iban:
-                error_msg = "Submission Denied: Bank IBAN Account Number is already registered."
+            if t.get('cnic_number') == cnic: error_msg = "Submission Denied: CNIC already registered."
+            if t.get('phone_number') == phone: error_msg = "Submission Denied: Mobile Number already registered."
+            if vendor and t.get('vendor_id') == vendor: error_msg = "Submission Denied: Vendor ID already registered."
+            if iban and t.get('iban') == iban: error_msg = "Submission Denied: Bank IBAN Account Number already registered."
             if error_msg: break
                 
         if error_msg:
-            return "<div style='color:red; font-family:sans-serif; text-align:center; padding:50px;'><h2>" + error_msg + "</h2><br><a href='/'>Return to Form</a></div>"
+            return f"<div style='color:red; font-family:sans-serif; text-align:center; padding:50px;'><h2>{error_msg}</h2><br><a href='/'>Return to Form</a></div>"
 
         next_id = len(trainees) + 1
         new_trainee = {
-            "id": next_id,
-            "center_name": request.form.get('center_name'),
-            "full_name": request.form.get('full_name'),
-            "father_name": request.form.get('father_name'),
-            "cnic_number": cnic,
-            "phone_number": phone,
-            "session_cohort": request.form.get('session_cohort'),
-            "email_address": request.form.get('email_address'),
-            "course_module": request.form.get('course_module'),
-            "gender": request.form.get('gender'),
-            "local_status": request.form.get('local_status'),
-            "vendor_id": vendor if vendor else None,
-            "iban": iban if iban else None,
-            "stipend": request.form.get('stipend'),
-            "wallet_number": request.form.get('wallet_number')
+            "id": next_id, "center_name": request.form.get('center_name'), "full_name": request.form.get('full_name'),
+            "father_name": request.form.get('father_name'), "cnic_number": cnic, "phone_number": phone,
+            "session_cohort": request.form.get('session_cohort'), "email_address": request.form.get('email_address'),
+            "course_module": request.form.get('course_module'), "gender": request.form.get('gender'),
+            "local_status": request.form.get('local_status'), "vendor_id": vendor if vendor else None,
+            "iban": iban if iban else None, "stipend": request.form.get('stipend'), "wallet_number": request.form.get('wallet_number')
         }
         trainees.append(new_trainee)
         save_data(TRAINEES_FILE, trainees)
-        return "<div style='color:green; font-family:sans-serif; text-align:center; padding:50px;'><h2>Trainee Registered Successfully!</h2><br><a href='/'>Go Back Home</a></div>"
+        return "<div style='color:green; font-family:sans-serif; text-align:center; padding:50px;'><h2>Trainee Enrolled Successfully!</h2><br><a href='/'>Go Back Home</a></div>"
         
     all_centers = load_data(CENTERS_FILE)
     functional_centers = [c for c in all_centers if c.get('status') == 'Functional']
@@ -117,6 +101,7 @@ def admin_login():
 def admin_dashboard():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
     role = session.get('user_role')
+    
     all_trainees = load_data(TRAINEES_FILE)
     all_centers = load_data(CENTERS_FILE)
     all_docs = load_data(DOCS_FILE)
@@ -136,16 +121,19 @@ def admin_dashboard():
         docs_from_me = [d for d in all_docs if d.get('direction') == 'centers_to_directorate']
         ddo_accounts = all_users
 
-    total_trainees = len(view_trainees)
+    total_trainees = len(view_trainees) if isinstance(view_trainees, list) else 0
     trade_metrics = {}
-    for t in view_trainees:
-        trade = t.get('course_module', 'Unassigned')
-        trade_metrics[trade] = trade_metrics.get(trade, 0) + 1
+    if isinstance(view_trainees, list):
+        for t in view_trainees:
+            trade = t.get('course_module', 'Unassigned')
+            trade_metrics[trade] = trade_metrics.get(trade, 0) + 1
 
     extra_keys = set()
-    for c in view_centers:
-        fields = c.get('extra_fields_data', {})
-        for k in fields.keys(): extra_keys.add(k)
+    if isinstance(view_centers, list):
+        for c in view_centers:
+            fields = c.get('extra_fields_data', {})
+            if isinstance(fields, dict):
+                for k in fields.keys(): extra_keys.add(k)
 
     return render_template('dashboard.html', trainees=view_trainees, centers=view_centers, extra_keys=list(extra_keys), total_trainees=total_trainees, trade_metrics=trade_metrics, ddo_accounts=ddo_accounts, all_centers_list=all_centers, docs_to_me=docs_to_me, docs_from_me=docs_from_me)
 
