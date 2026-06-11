@@ -1,16 +1,9 @@
 import os, json
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
+from flask import Flask, request, redirect, url_for, session, send_from_directory
 from werkzeug.utils import secure_filename
-from jinja2 import ChoiceLoader, FileSystemLoader
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-2026-master-key')
-
-app.jinja_loader = ChoiceLoader([
-    FileSystemLoader(os.path.join(app.root_path, 'templates')),
-    FileSystemLoader(os.path.join(app.root_path, 'templates', 'templates')),
-    FileSystemLoader(app.root_path)
-])
+app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-2026-master-standalone')
 
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/opt/render/project/src/static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -29,8 +22,8 @@ def load_data(file_path):
         with open(file_path, 'w') as f: json.dump([], f)
     try:
         with open(file_path, 'r') as f:
-            data = json.load(f)
-            return data if isinstance(data, list) else []
+            d = json.load(f)
+            return d if isinstance(d, list) else []
     except: return []
 
 def save_data(file_path, data):
@@ -41,6 +34,9 @@ load_data(CENTERS_FILE)
 load_data(USERS_FILE)
 load_data(DOCS_FILE)
 
+# ----------------------------------------------------
+# VISUAL CLIENT INTAKE WEB-PORTAL CONTROLLER
+# ----------------------------------------------------
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/register', methods=['GET', 'POST'])
 def public_registration():
@@ -53,18 +49,17 @@ def public_registration():
         
         error_msg = None
         for t in trainees:
-            if t.get('cnic_number') == cnic: error_msg = "Submission Denied: CNIC already registered."
-            if t.get('phone_number') == phone: error_msg = "Submission Denied: Mobile Number already registered."
-            if vendor and t.get('vendor_id') == vendor: error_msg = "Submission Denied: Vendor ID already registered."
-            if iban and t.get('iban') == iban: error_msg = "Submission Denied: Bank IBAN Account Number already registered."
+            if t.get('cnic_number') == cnic: error_msg = "Submission Denied: CNIC Number is already registered."
+            if t.get('phone_number') == phone: error_msg = "Submission Denied: Mobile Number is already in use."
+            if vendor and t.get('vendor_id') == vendor: error_msg = "Submission Denied: Vendor ID is already registered."
+            if iban and t.get('iban') == iban: error_msg = "Submission Denied: Bank Account Number (IBAN) is already registered."
             if error_msg: break
                 
         if error_msg:
-            return f"<div style='color:red; font-family:sans-serif; text-align:center; padding:50px;'><h2>{error_msg}</h2><br><a href='/'>Return to Form</a></div>"
+            return f"<div style='color:red; font-family:sans-serif; text-align:center; padding:50px;'><h2>{error_msg}</h2><br><a href='/'>Return to Form and Correct Fields</a></div>"
 
-        next_id = len(trainees) + 1
         new_trainee = {
-            "id": next_id, "center_name": request.form.get('center_name'), "full_name": request.form.get('full_name'),
+            "id": len(trainees) + 1, "center_name": request.form.get('center_name'), "full_name": request.form.get('full_name'),
             "father_name": request.form.get('father_name'), "cnic_number": cnic, "phone_number": phone,
             "session_cohort": request.form.get('session_cohort'), "email_address": request.form.get('email_address'),
             "course_module": request.form.get('course_module'), "gender": request.form.get('gender'),
@@ -73,126 +68,93 @@ def public_registration():
         }
         trainees.append(new_trainee)
         save_data(TRAINEES_FILE, trainees)
-        return "<div style='color:green; font-family:sans-serif; text-align:center; padding:50px;'><h2>Trainee Enrolled Successfully!</h2><br><a href='/'>Go Back Home</a></div>"
+        return "<div style='color:green; font-family:sans-serif; text-align:center; padding:50px;'><h2>Trainee Successfully Enrolled!</h2><br><a href='/'>Go Back Home</a></div>"
         
-    all_centers = load_data(CENTERS_FILE)
-    functional_centers = [c for c in all_centers if c.get('status') == 'Functional']
-    return render_template('public_form.html', centers=functional_centers)
-
-@app.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
-        if username == "admin" and password == "protected123":
-            session['user_role'] = 'CENTRAL_ADMIN'
-            session['logged_in'] = True
-            return redirect(url_for('admin_dashboard'))
-        users = load_data(USERS_FILE)
-        for u in users:
-            if u.get('username') == username and u.get('password') == password:
-                session['user_role'] = 'DDO_USER'
-                session['logged_in'] = True
-                session['assigned_center'] = u.get('center_name')
-                return redirect(url_for('admin_dashboard'))
-    return render_template('admin_login.html')
-
-@app.route('/admin/dashboard')
-def admin_dashboard():
-    if not session.get('logged_in'): return redirect(url_for('admin_login'))
-    role = session.get('user_role')
-    
-    all_trainees = load_data(TRAINEES_FILE)
-    all_centers = load_data(CENTERS_FILE)
-    all_docs = load_data(DOCS_FILE)
-    all_users = load_data(USERS_FILE)
-    
-    if role == 'DDO_USER':
-        target = session.get('assigned_center')
-        view_trainees = [t for t in all_trainees if t.get('center_name') == target]
-        view_centers = [c for c in all_centers if c.get('center_name') == target]
-        docs_to_me = [d for d in all_docs if d.get('direction') == 'directorate_to_centers']
-        docs_from_me = [d for d in all_docs if d.get('direction') == 'centers_to_directorate' and d.get('center_name') == target]
-        ddo_accounts = []
-    else:
-        view_trainees = all_trainees
-        view_centers = all_centers
-        docs_to_me = [d for d in all_docs if d.get('direction') == 'directorate_to_centers']
-        docs_from_me = [d for d in all_docs if d.get('direction') == 'centers_to_directorate']
-        ddo_accounts = all_users
-
-    total_trainees = len(view_trainees)
-    trade_metrics = {}
-    for t in view_trainees:
-        trade = t.get('course_module', 'Unassigned')
-        trade_metrics[trade] = trade_metrics.get(trade, 0) + 1
-
-    # FIXED DATA FLATTENING LAYER: Injects dynamic properties cleanly before sending to view
-    processed_centers = []
-    extra_keys = set()
-    for c in view_centers:
-        fields = c.get('extra_fields_data', {})
-        if not isinstance(fields, dict): fields = {}
-        for k in fields.keys(): extra_keys.add(k)
-        processed_centers.append(c)
-
-    return render_template('dashboard.html', 
-                           trainees=view_trainees, 
-                           centers=processed_centers, 
-                           extra_keys=list(extra_keys), 
-                           total_trainees=total_trainees, 
-                           trade_metrics=trade_metrics, 
-                           ddo_accounts=ddo_accounts, 
-                           all_centers_list=all_centers, 
-                           docs_to_me=docs_to_me, 
-                           docs_from_me=docs_from_me)
-
-@app.route('/admin/add-center', methods=['POST'])
-def add_center():
-    if not session.get('logged_in') or session.get('user_role') != 'CENTRAL_ADMIN': return "Unauthorized", 403
     centers = load_data(CENTERS_FILE)
-    ddo_code = request.form.get('ddo_code')
-    center_name = request.form.get('center_name')
-    status = request.form.get('status')
-    sector = request.form.get('sector')
-    ddo_name = request.form.get('ddo_name')
+    functional_centers = [c for c in centers if c.get('status') == 'Functional']
     
-    payload = {k: v for k, v in request.form.items() if k not in ['ddo_code', 'center_name', 'status', 'sector', 'ddo_name']}
-    centers.append({"ddo_code": ddo_code, "center_name": center_name, "status": status, "sector": sector, "ddo_name": ddo_name, "extra_fields_data": payload})
-    save_data(CENTERS_FILE, centers)
-    return redirect(url_for('admin_dashboard'))
-
-@app.route('/admin/create-ddo-user', methods=['POST'])
-def create_ddo_user():
-    if not session.get('logged_in') or session.get('user_role') != 'CENTRAL_ADMIN': return "Unauthorized", 403
-    users = load_data(USERS_FILE)
-    users.append({"center_name": request.form.get('center_name'), "username": request.form.get('ddo_username', '').strip(), "password": request.form.get('ddo_password', '').strip()})
-    save_data(USERS_FILE, users)
-    return redirect(url_for('admin_dashboard'))
-
-@app.route('/admin/upload-document', methods=['POST'])
-def upload_document():
-    if not session.get('logged_in'): return redirect(url_for('admin_login'))
-    direction = request.form.get('channel_direction')
-    file = request.files.get('vault_file')
-    if file and file.filename != '':
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        center_name = session.get('assigned_center', 'Directorate Desk') if session.get('user_role') == 'DDO_USER' else request.form.get('target_center', 'Global Desk')
-        docs = load_data(DOCS_FILE)
-        docs.append({"direction": direction, "filename": filename, "center_name": center_name})
-        save_data(DOCS_FILE, docs)
-    return redirect(url_for('admin_dashboard'))
-
-@app.route('/admin/download-file/<filename>')
-def download_file(filename):
-    if not session.get('logged_in'): return redirect(url_for('admin_login'))
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
-
-@app.route('/admin/logout')
-def admin_logout():
-    session.clear()
-    return redirect(url_for('public_registration'))
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    options_html = "".join([f"<option value='{c.get('center_name')}'>{c.get('center_name')}</option>" for c in functional_centers])
+    
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Small Industries Wing, Balochistan</title>
+        <style>
+            body {{ font-family: 'Segoe UI', sans-serif; background-color: #0f172a; margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; }}
+            .wrapper {{ width: 100%; max-width: 850px; background: #ffffff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; }}
+            .branding-header {{ background: #004d26; color: #ffffff; padding: 35px 20px; text-align: center; }}
+            .branding-header h1 {{ margin: 0; font-size: 26px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }}
+            .branding-header p {{ margin: 8px 0 0 0; font-size: 13px; opacity: 0.85; }}
+            .accent-strip {{ background: #d4af37; height: 5px; }}
+            .form-body {{ padding: 40px; }}
+            .form-section-title {{ font-size: 14px; color: #004d26; font-weight: bold; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 30px; margin-bottom: 18px; text-transform: uppercase; }}
+            .input-row {{ display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 15px; }}
+            @media(min-width: 768px) {{ .input-row {{ grid-template-columns: 1fr 1fr; }} }}
+            .field-box {{ display: flex; flex-direction: column; }}
+            .field-box label {{ font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #34495e; text-transform: uppercase; }}
+            .field-box input, .field-box select {{ padding: 11px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; background-color: #f8fafc; box-sizing: border-box; }}
+            .submit-container {{ margin-top: 35px; }}
+            .btn-register {{ background: #004d26; color: #fff; border: none; padding: 15px; border-radius: 4px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }}
+            .gateway-footer {{ text-align: center; margin-top: 40px; padding-top: 25px; border-top: 1px solid #e2e8f0; }}
+            .gateway-footer a {{ background: #1e293b; color: #ffffff; text-decoration: none; font-weight: 600; padding: 12px 24px; border-radius: 4px; border: 1px solid #475569; font-size: 13px; text-transform: uppercase; display: inline-block; }}
+        </style>
+    </head>
+    <body>
+    <div class="wrapper">
+        <div class="branding-header">
+            <h1>Small Industries Wing, Balochistan</h1>
+            <p>National Trainee Enrollment & Registration Portal — Directorate Training Division Management System</p>
+        </div>
+        <div class="accent-strip"></div>
+        <form class="form-body" method="POST" action="/">
+            <div class="form-section-title">A. CENTER ALLOCATION DETAILS</div>
+            <div class="input-row" style="grid-template-columns: 1fr;">
+                <div class="field-box">
+                    <label>Center / DDO Unit Name</label>
+                    <select name="center_name" required>
+                        <option value="">-- Choose Assigned Location --</option>
+                        {options_html}
+                    </select>
+                </div>
+            </div>
+            <div class="form-section-title">B. PERSONAL PROFILE PARTICULARS</div>
+            <div class="input-row">
+                <div class="field-box"><label>Full Name (As per CNIC)</label><input type="text" name="full_name" required></div>
+                <div class="field-box"><label>Father Name</label><input type="text" name="father_name" required></div>
+            </div>
+            <div class="input-row">
+                <div class="field-box"><label>CNIC Number</label><input type="text" name="cnic_number" placeholder="xxxxx-xxxxxxx-x" required></div>
+                <div class="field-box"><label>Mobile Contact Number</label><input type="text" name="phone_number" required></div>
+            </div>
+            <div class="input-row">
+                <div class="field-box"><label>Session Batch Cohort</label><input type="text" name="session_cohort" required></div>
+                <div class="field-box"><label>Email Address</label><input type="email" name="email_address" required></div>
+            </div>
+            <div class="input-row" style="grid-template-columns: 1fr;">
+                <div class="field-box"><label>Assigned Course Module</label><input type="text" name="course_module" required></div>
+            </div>
+            <div class="form-section-title">C. STATUS AND DEMOGRAPHICS CLASSIFICATION</div>
+            <div class="input-row">
+                <div class="field-box">
+                    <label>Gender Classification</label>
+                    <select name="gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="field-box"><label>Local Status Residency</label><input type="text" name="local_status" required></div>
+            </div>
+            <div class="form-section-title">D. FINANCIAL DISBURSEMENT ACCOUNTS</div>
+            <div class="input-row">
+                <div class="field-box"><label>Vendor Identification Number</label><input type="text" name="vendor_id"></div>
+                <div class="field-box"><label>Bank Account Number (IBAN)</label><input type="text" name="iban"></div>
+            </div>
+            <div class="input-row">
+                <div class="field-box"><label>Monthly Stipend Allowance (Rs.)</label><input type="text" name="stipend" placeholder="e.g. 5000"></div>
+                <div class="field-box"><label>Easypaisa / Omni / Mobi Cash Account Number</label><input type="text" name="wallet_number"></div>
+            </div>
+            <div class="submit-container">
+                <button type="submit" class="btn-register">Submit Official Enrollment Registration</button>
+            </div>
+            <div class="gateway-footer">
