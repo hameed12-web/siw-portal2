@@ -1,9 +1,17 @@
 import os, json
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from werkzeug.utils import secure_filename
+from jinja2 import ChoiceLoader, FileSystemLoader
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-2026-json-master')
+
+# SMART COMPONENT PATH RESOLVER: Forces Flask to look everywhere at once
+app.jinja_loader = ChoiceLoader([
+    FileSystemLoader(os.path.join(app.root_path, 'templates')),
+    FileSystemLoader(os.path.join(app.root_path, 'templates', 'templates')),
+    FileSystemLoader(app.root_path)
+])
 
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/opt/render/project/src/static/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
