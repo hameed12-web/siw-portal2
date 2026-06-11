@@ -6,7 +6,6 @@ from jinja2 import ChoiceLoader, FileSystemLoader
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'siw-balochistan-2026-json-master')
 
-# SMART COMPONENT PATH RESOLVER: Forces Flask to look everywhere at once
 app.jinja_loader = ChoiceLoader([
     FileSystemLoader(os.path.join(app.root_path, 'templates')),
     FileSystemLoader(os.path.join(app.root_path, 'templates', 'templates')),
@@ -25,15 +24,19 @@ CENTERS_FILE = os.path.join(DATA_DIR, 'centers.json')
 USERS_FILE = os.path.join(DATA_DIR, 'users.json')
 DOCS_FILE = os.path.join(DATA_DIR, 'docs.json')
 
+# CRASH PROTECTION: Always ensures arrays are returned as valid iterable lists
 def load_data(file_path):
     if not os.path.exists(file_path):
         with open(file_path, 'w') as f: json.dump([], f)
     try:
-        with open(file_path, 'r') as f: return json.load(f)
-    except: return []
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+            return data if isinstance(data, list) else []
+    except: 
+        return []
 
 def save_data(file_path, data):
-    with open(file_path, 'w') as f: json.dump(data, f, indent=4)
+    with open(file_path, 'w') as f: json.dump(data if isinstance(data, list) else [], f, indent=4)
 
 load_data(TRAINEES_FILE)
 load_data(CENTERS_FILE)
@@ -100,6 +103,8 @@ def admin_login():
 def admin_dashboard():
     if not session.get('logged_in'): return redirect(url_for('admin_login'))
     role = session.get('user_role')
+    
+    # Pre-populate variables cleanly to stop formatting issues
     all_trainees = load_data(TRAINEES_FILE)
     all_centers = load_data(CENTERS_FILE)
     all_docs = load_data(DOCS_FILE)
@@ -119,18 +124,30 @@ def admin_dashboard():
         docs_from_me = [d for d in all_docs if d.get('direction') == 'centers_to_directorate']
         ddo_accounts = all_users
 
-    total_trainees = len(view_trainees)
+    total_trainees = len(view_trainees) if isinstance(view_trainees, list) else 0
     trade_metrics = {}
-    for t in view_trainees:
-        trade = t.get('course_module', 'Unassigned')
-        trade_metrics[trade] = trade_metrics.get(trade, 0) + 1
+    if isinstance(view_trainees, list):
+        for t in view_trainees:
+            trade = t.get('course_module', 'Unassigned')
+            trade_metrics[trade] = trade_metrics.get(trade, 0) + 1
 
     extra_keys = set()
-    for c in view_centers:
-        fields = c.get('extra_fields_data', {})
-        for k in fields.keys(): extra_keys.add(k)
+    if isinstance(view_centers, list):
+        for c in view_centers:
+            fields = c.get('extra_fields_data', {})
+            if isinstance(fields, dict):
+                for k in fields.keys(): extra_keys.add(k)
 
-    return render_template('dashboard.html', trainees=view_trainees, centers=view_centers, extra_keys=list(extra_keys), total_trainees=total_trainees, trade_metrics=trade_metrics, ddo_accounts=ddo_accounts, all_centers_list=all_centers, docs_to_me=docs_to_me, docs_from_me=docs_from_me)
+    return render_template('dashboard.html', 
+                           trainees=view_trainees if view_trainees else [], 
+                           centers=view_centers if view_centers else [], 
+                           extra_keys=list(extra_keys), 
+                           total_trainees=total_trainees, 
+                           trade_metrics=trade_metrics, 
+                           ddo_accounts=ddo_accounts if ddo_accounts else [], 
+                           all_centers_list=all_centers if all_centers else [], 
+                           docs_to_me=docs_to_me if docs_to_me else [], 
+                           docs_from_me=docs_from_me if docs_from_me else [])
 
 @app.route('/admin/add-center', methods=['POST'])
 def add_center():
