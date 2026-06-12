@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Management Suite - Small Industries Wing, Balochistan</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f6f9; color: #333; }
         header { background: #004d40; color: white; padding: 20px; border-radius: 6px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         header h1 { margin: 0; font-size: 24px; }
-        .logout { background: #c62828; color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px; transition: background 0.2s; }
-        .logout:hover { background: #b71c1c; }
+        .logout { background: #c62828; color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px; }
         .card { background: white; padding: 20px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 25px; }
         h3 { color: #004d40; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 18px; }
         .table-container { overflow-x: auto; margin-top: 15px; }
@@ -18,31 +16,25 @@
         th { background: #f8f9fa; font-weight: 600; color: #495057; }
         tr:nth-child(even) { background: #fafafa; }
         .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 15px; }
-        input, select, button { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box; }
-        button { background: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; transition: background 0.2s; }
-        button:hover { background: #0056b3; }
+        input, select, button { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
         .btn-sec { background: #28a745; }
-        .btn-sec:hover { background: #218838; }
-        .status-badge { font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
-        .status-functional { background: #e8f5e9; color: #2e7d32; }
-        .status-nonfunctional { background: #ffebee; color: #c62828; }
     </style>
 </head>
 <body>
 
-    <!-- Main Branding Header -->
     <header>
         <div>
             <h1>Small Industries Wing, Balochistan</h1>
             <div style="margin-top: 5px; opacity: 0.9; font-size: 14px;">
-                Management Suite Console | Profile Authority Role: <strong>{{ user_role | uppercase }}</strong>
-                {% if user_role == 'incharge' %} (Assigned: {{ assigned_center }}) {% endif %}
+                Management Suite Console | System Authority Level: <strong>{{ user_role }}</strong>
+                {% if user_role == 'incharge' %} (Assigned Center: {{ assigned_center }}) {% endif %}
             </div>
         </div>
         <a href="/admin/logout" class="logout">Logout Suite</a>
     </header>
 
-    <!-- 1. Trainee Registration Enrollment Matrix Table -->
+    <!-- Trainee Registration Enrollment Matrix Table -->
     <div class="card">
         <h3>🎓 Trainees Enrollment Matrix Records</h3>
         <div class="table-container">
@@ -60,12 +52,12 @@
                 <tbody>
                     {% for trainee in trainees %}
                     <tr>
-                        <td><strong>{{ trainee['trainee_name'] }}</strong></td>
-                        <td>{{ trainee['cnic_or_bform'] }}</td>
-                        <td>{{ trainee['phone_number'] }}</td>
-                        <td>{{ trainee['center_name'] }}</td>
-                        <td>{{ trainee['trade_name'] }}</td>
-                        <td>{{ trainee['enrollment_date'] }}</td>
+                        <td><strong>{{ trainee.trainee_name }}</strong></td>
+                        <td>{{ trainee.cnic_or_bform }}</td>
+                        <td>{{ trainee.phone_number }}</td>
+                        <td>{{ trainee.center_name }}</td>
+                        <td>{{ trainee.trade_name }}</td>
+                        <td>{{ trainee.enrollment_date }}</td>
                     </tr>
                     {% else %}
                     <tr>
@@ -77,7 +69,7 @@
         </div>
     </div>
 
-    <!-- 2. Registered Training Centers Base Table Section -->
+    <!-- Registered Training Centers Table Section -->
     <div class="card">
         <h3>🏢 Registered Training Centers Administration Section</h3>
         <div class="table-container">
@@ -90,7 +82,6 @@
                         <th>Functional / Non-Functional</th>
                         <th>Govt / Private</th>
                         <th>DDO Name</th>
-                        <!-- Render headers for dynamic columns -->
                         {% for col in custom_columns %}
                             <th>{{ col }}</th>
                         {% endfor %}
@@ -99,26 +90,19 @@
                 <tbody>
                     {% for center in centers %}
                     <tr>
-                        <td>{{ center['s_no'] }}</td>
-                        <td>{{ center['ddo_code'] }}</td>
-                        <td><strong>{{ center['center_name'] }}</strong></td>
-                        <td>
-                            {% if center['status'] == 'Functional' %}
-                                <span class="status-badge status-functional">Functional</span>
-                            {% else %}
-                                <span class="status-badge status-nonfunctional">Non-Functional</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ center['type'] }}</td>
-                        <td>{{ center['ddo_name'] }}</td>
-                        <!-- Render variable values for extra dynamic columns -->
+                        <td>{{ center.s_no }}</td>
+                        <td>{{ center.ddo_code }}</td>
+                        <td><strong>{{ center.center_name }}</strong></td>
+                        <td>{{ center.status }}</td>
+                        <td>{{ center.type }}</td>
+                        <td>{{ center.ddo_name }}</td>
                         {% for col in custom_columns %}
                             <td>{{ center[col] if center[col] else '-' }}</td>
                         {% endfor %}
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="{{ 6 + (custom_columns | length) }}" style="text-align: center; color: #888; padding: 20px;">No training centers registered yet.</td>
+                        <td colspan="6" style="text-align: center; color: #888; padding: 20px;">No training centers registered yet.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -126,20 +110,16 @@
         </div>
     </div>
 
-    <!-- 3. Dynamic Controls Panel (Exclusively visible to central Admin role) -->
+    <!-- Dynamic Customization Systems Panel (Only Visible to Admin Accounts) -->
     {% if user_role == 'admin' %}
-    
-    <!-- Dynamic Column System Settings Addon Section -->
     <div class="card">
-        <h3>⚙️ Dynamic Table Structure Configuration</h3>
-        <p style="font-size: 13px; color: #666; margin: 0 0 10px 0;">Add an extra column here to instantly expand the Training Center table database fields dynamically.</p>
+        <h3>⚙️ Dynamic Table Columns Structuring</h3>
         <form action="/admin/add_column" method="POST" style="display: flex; gap: 10px;">
-            <input type="text" name="new_column_name" placeholder="Enter extra column title (e.g., Equipment Total, Location Address, Contact Info)" style="flex: 1;" required>
+            <input type="text" name="new_column_name" placeholder="Enter extra column title" style="flex: 1;" required>
             <button type="submit" class="btn-sec">+ Deploy Extra Column</button>
         </form>
     </div>
 
-    <!-- New Row Database Entry Addition Area -->
     <div class="card">
         <h3>➕ Insert New Training Center Dataset Instance</h3>
         <form action="/admin/add_center" method="POST">
@@ -147,41 +127,40 @@
                 <input type="text" name="s_no" placeholder="S.No" required>
                 <input type="text" name="ddo_code" placeholder="DDO Code" required>
                 <input type="text" name="center_name" placeholder="Unique Center Name" required>
-                
                 <select name="status" required>
                     <option value="Functional">Functional</option>
                     <option value="Non-Functional">Non-Functional</option>
                 </select>
-                
                 <select name="type" required>
                     <option value="Government">Government</option>
                     <option value="Private">Private</option>
                 </select>
-                
                 <input type="text" name="ddo_name" placeholder="DDO Name" required>
-
-                <!-- Automatically output entry fields for any extra columns deployed -->
                 {% for col in custom_columns %}
-                    <input type="text" name="{{ col }}" placeholder="{{ col }} Input Value">
+                    <input type="text" name="{{ col }}" placeholder="{{ col }} Data Input">
                 {% endfor %}
             </div>
             <button type="submit" style="margin-top: 15px; width: 100%; background: #004d40; padding: 12px;">Save Training Center Profile Record</button>
         </form>
     </div>
 
-    <!-- User Profile & Privilege Delegation Control Panel -->
     <div class="card">
-        <h3>🔑 Create Incharge User Profiles (Role-Based Access Delegation Control)</h3>
-        <p style="font-size: 13px; color: #666; margin: 0 0 10px 0;">Create accounts for center incharges. When they log in, they will strictly be isolated to view data corresponding to their assigned center.</p>
+        <h3>🔑 Create Incharge User Profiles (Role-Based Access Control Delegation)</h3>
         <form action="/admin/create_user" method="POST">
             <div class="form-row">
                 <input type="text" name="username" placeholder="Choose Console Username" required>
                 <input type="password" name="password" placeholder="Choose Secure Password" required>
-                
                 <select name="center_name" required>
                     <option value="">-- Assign Target Center Scope --</option>
                     {% for center in centers %}
-                        <option value="{{ center['center_name'] }}">{{ center['center_name'] }}</option>
+                        <option value="{{ center.center_name }}">{{ center.center_name }}</option>
                     {% endfor %}
                 </select>
-                
+                <button type="submit" class="btn-sec" style="width: 100%;">Provision User Access Profile</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+</body>
+</html>
