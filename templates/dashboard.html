@@ -3,48 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Small Industries Wing, Balochistan</title>
+    <title>Dashboard - Small Industries Wing, Balochistan</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; }
-        header { background: #004d40; color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        header h1 { margin: 0; font-size: 28px; }
-        header p { margin: 5px 0 0 0; opacity: 0.8; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .form-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f6f9; color: #333; }
+        header { background: #004d40; color: white; padding: 20px; border-radius: 6px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 26px; }
+        header p { margin: 5px 0 0 0; opacity: 0.8; font-size: 14px; }
+        .logout-btn { background: #c62828; color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 13px; }
+        .logout-btn:hover { background: #b71c1c; }
+        .badge { background: #e0f2f1; color: #004d40; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .card { background: white; padding: 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); margin-bottom: 25px; }
+        .card h3 { margin-top: 0; color: #004d40; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .form-group { display: flex; gap: 10px; margin-top: 15px; }
         input, select, button { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        input[type="text"], input[type="number"] { flex: 1; }
+        input[type="text"] { flex: 1; }
         button { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
         button:hover { background-color: #0056b3; }
         .btn-success { background-color: #28a745; }
         .btn-success:hover { background-color: #218838; }
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; }
-        th, td { padding: 12px 15px; border: 1px solid #dee2e6; text-align: left; }
-        th { background-color: #e9ecef; color: #495057; }
-        tr:nth-child(even) { background-color: #f8f9fa; }
-        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .table-container { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 12px 15px; border: 1px solid #dee2e6; text-align: left; font-size: 14px; }
+        th { background-color: #f8f9fa; color: #495057; font-weight: 600; }
+        tr:nth-child(even) { background-color: #fafafa; }
+        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 15px; }
+        .alert-bar { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <!-- 1. Updated Branding -->
+    <!-- 1. Custom Balochistan Branding Header -->
     <header>
-        <h1>Small Industries Wing, Balochistan</h1>
-        <p>Admin Dashboard — Training Centers Management Portal</p>
+        <div>
+            <h1>Small Industries Wing, Balochistan</h1>
+            <p>Training Centers Management Portal <span class="badge">{{ user_role }} view</span></p>
+        </div>
+        <a href="/admin/logout" class="logout-btn">Logout</a>
     </header>
 
-    <!-- 2. Dynamic Column Control -->
+    <!-- Message Flash Box System -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-bar">✓ {{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- 2. Dynamic Table Column Configuration (Only shows if User is Admin) -->
+    {% if user_role == 'admin' %}
     <div class="card">
-        <h3>⚙️ Customization Settings</h3>
+        <h3>⚙️ Table Dynamic Structural Customization</h3>
         <form action="/admin/add_column" method="POST" class="form-group">
-            <input type="text" name="new_column_name" placeholder="Enter new column name (e.g., Contact No, Location)" required>
+            <input type="text" name="new_column_name" placeholder="Enter extra column name (e.g., Contact No, Total Computers, Address)" required>
             <button type="submit" class="btn-success">+ Add Extra Column</button>
         </form>
     </div>
+    {% endif %}
 
-    <!-- 3. Training Centers Data Matrix -->
+    <!-- 3. Central Training Center Records Matrix -->
     <div class="card">
-        <h3>📍 Registered Training Centers</h3>
+        <h3>📍 Registered Systems & Training Centers</h3>
         <div class="table-container">
             <table>
                 <thead>
@@ -55,7 +74,7 @@
                         <th>Functional / Non-Functional</th>
                         <th>Govt / Private</th>
                         <th>DDO Name</th>
-                        <!-- Render Dynamic Custom Columns -->
+                        <!-- Prints out any extra column headers dynamically added -->
                         {% for col in custom_columns %}
                             <th>{{ col }}</th>
                         {% endfor %}
@@ -64,20 +83,26 @@
                 <tbody>
                     {% for center in centers %}
                     <tr>
-                        <td>{{ center['s_no'] }}</td>
+                        <td><strong>{{ center['s_no'] }}</strong></td>
                         <td>{{ center['ddo_code'] }}</td>
                         <td>{{ center['center_name'] }}</td>
-                        <td>{{ center['status'] }}</td>
+                        <td>
+                            <span style="color: {{ '#2e7d32' if center['status'] == 'Functional' else '#c62828' }}; font-weight: bold;">
+                                {{ center['status'] }}
+                            </span>
+                        </td>
                         <td>{{ center['type'] }}</td>
                         <td>{{ center['ddo_name'] }}</td>
-                        <!-- Render Dynamic Row Content -->
+                        <!-- Dynamically maps data elements for extra headers -->
                         {% for col in custom_columns %}
                             <td>{{ center[col] if center[col] else '-' }}</td>
                         {% endfor %}
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="{{ 6 + (custom_columns|length) }}" style="text-align: center; color: #777;">No records found. Add a training center below.</td>
+                        <td colspan="{{ 6 + (custom_columns|length) }}" style="text-align: center; color: #888; padding: 30px;">
+                            No records found inside the datastore database.
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -85,9 +110,10 @@
         </div>
     </div>
 
-    <!-- 4. Records Entry Form -->
+    <!-- 4. Interactive Row Creation Entry Block (Only shows if User is Admin) -->
+    {% if user_role == 'admin' %}
     <div class="card">
-        <h3>➕ Add New Training Center</h3>
+        <h3>➕ Insert New Training Center Dataset</h3>
         <form action="/admin/add_center" method="POST">
             <div class="grid-form">
                 <input type="text" name="s_no" placeholder="S.No" required>
@@ -106,14 +132,21 @@
 
                 <input type="text" name="ddo_name" placeholder="DDO Name" required>
 
-                <!-- Generate dynamic inputs matching added columns -->
+                <!-- Loops through and displays entry fields for extra dynamically created columns -->
                 {% for col in custom_columns %}
-                    <input type="text" name="{{ col }}" placeholder="{{ col }}">
+                    <input type="text" name="{{ col }}" placeholder="{{ col }} Entry Value">
                 {% endfor %}
             </div>
-            <button type="submit" style="margin-top: 15px; width: 100%;">Save System Record</button>
+            <button type="submit" style="margin-top: 20px; width: 100%; background-color: #004d40; padding: 12px;">
+                Save Training Center Entry Record
+            </button>
         </form>
     </div>
+    {% else %}
+    <div class="card" style="background: #fff3e0; border: 1px solid #ffe0b2; color: #e65100;">
+        ℹ️ You are signed in via a read-only viewer profile. Changing fields or adding rows is restricted to administrative managers.
+    </div>
+    {% endif %}
 
 </body>
 </html>
