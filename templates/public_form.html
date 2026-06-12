@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Public Trainee Enrollment - Small Industries Wing, Balochistan</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
@@ -47,7 +48,7 @@
             <select name="center_name" required>
                 <option value="">-- Choose Center --</option>
                 {% for center in centers %}
-                    <option value="{{ center['center_name'] }}">{{ center['center_name'] }}</option>
+                    <option value="{{ center.center_name }}">{{ center.center_name }}</option>
                 {% endfor %}
             </select>
 
