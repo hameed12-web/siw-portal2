@@ -1,34 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Secure Administrative Login Gateway</title>
+    <title>Console Login - Small Industries Wing, Balochistan</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #0f172a; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .login-card { background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 420px; box-sizing: border-box; }
-        h2 { color: #0f172a; margin: 0 0 8px 0; font-size: 20px; text-transform: uppercase; font-weight: 700; text-align: center; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: #475569; text-transform: uppercase; margin-bottom: 6px; }
-        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-size: 14px; background: #f8fafc; }
-        .btn-verify { background: #1e293b; color: white; text-transform: uppercase; font-weight: bold; border: none; width: 100%; padding: 14px; border-radius: 4px; cursor: pointer; width: 100%; }
-        .back-link { margin-top: 25px; display: block; font-size: 12px; color: #004d26; text-decoration: none; font-weight: bold; text-align: center; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 350px; text-align: center; }
+        h2 { color: #004d40; margin: 0 0 5px 0; }
+        h3 { font-size: 13px; color: #666; font-weight: 400; margin: 0 0 25px 0; }
+        input { width: 100%; padding: 11px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 11px; background: #004d40; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .err { color: #c62828; font-size: 13px; margin-bottom: 15px; text-align: left; background: #ffebee; padding: 8px; border-radius: 4px; }
+        .back-home { margin-top: 15px; display: block; font-size: 12px; color: #004d40; text-decoration: none; }
     </style>
 </head>
 <body>
-<div class="login-card">
-    <h2>Secure Gateway Login</h2>
-    <form method="POST" action="/admin/login">
-        <div class="form-group">
-            <label>Username Account ID</label>
-            <input type="text" name="username" required autocomplete="off">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" required>
-        </div>
-        <button type="submit" class="btn-verify">Verify Identity Credentials</button>
-    </form>
-    <a href="/" class="back-link">📋 Return to Public Portal Form</a>
-</div>
+    <div class="card">
+        <h2>Small Industries Wing</h2>
+        <h3>Government of Balochistan</h3>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for msg in messages %}<div class="err">{{ msg }}</div>{% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST">
+            <input type="text" name="username" placeholder="Console Username" required>
+            <input type="password" name="password" placeholder="Console Password" required>
+            <button type="submit">Verify & Login</button>
+        </form>
+        <a href="/" class="back-home">← Back to Enrollment Form</a>
+    </div>
 </body>
 </html>
