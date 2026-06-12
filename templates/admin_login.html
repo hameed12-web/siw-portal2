@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Console Login - Small Industries Wing, Balochistan</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
@@ -9,7 +10,8 @@
         h3 { font-size: 13px; color: #666; font-weight: 400; margin: 0 0 25px 0; }
         input { width: 100%; padding: 11px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         button { width: 100%; padding: 11px; background: #004d40; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .err { color: #c62828; font-size: 13px; margin-bottom: 15px; text-align: left; background: #ffebee; padding: 8px; border-radius: 4px; }
+        button:hover { background: #00332c; }
+        .err { color: #c62828; font-size: 13px; margin-bottom: 15px; text-align: left; background: #ffebee; padding: 8px; border-radius: 4px; border: 1px solid #ffcdd2; }
         .back-home { margin-top: 15px; display: block; font-size: 12px; color: #004d40; text-decoration: none; }
     </style>
 </head>
@@ -17,11 +19,15 @@
     <div class="card">
         <h2>Small Industries Wing</h2>
         <h3>Government of Balochistan</h3>
+        
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                {% for msg in messages %}<div class="err">{{ msg }}</div>{% endfor %}
+                {% for msg in messages %}
+                    <div class="err">⚠️ {{ msg }}</div>
+                {% endfor %}
             {% endif %}
         {% endwith %}
+        
         <form method="POST">
             <input type="text" name="username" placeholder="Console Username" required>
             <input type="password" name="password" placeholder="Console Password" required>
