@@ -1,7 +1,7 @@
 import os
 import sqlite3
 from functools import wraps
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, render_template_string
 
 app = Flask(__name__)
 app.secret_key = 'siw_balochistan_secret_secure_key_2026'
@@ -44,24 +44,23 @@ def init_db():
         )
     ''')
     
-    # Pre-seed default test accounts if the system is completely clean
+    # Pre-seed default accounts
     try:
         conn.execute("INSERT INTO system_users (username, password, role) VALUES ('admin', 'admin123', 'admin')")
         conn.execute("INSERT INTO system_users (username, password, role) VALUES ('user', 'user123', 'viewer')")
     except sqlite3.IntegrityError:
-        pass # Users already exist
+        pass
         
     conn.commit()
     conn.close()
 
 init_db()
 
-# --- SECURITY INTERCEPTORS (DECORATORS) ---
+# --- SECURITY INTERCEPTORS ---
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            flash('Please log in to access this section.', 'error')
             return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -81,10 +80,15 @@ def admin_required(f):
 
 @app.route('/')
 def home_redirect():
+    if 'user_id' in session:
+        return redirect(url_for('admin_dashboard'))
     return redirect(url_for('admin_login'))
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
+    if 'user_id' in session:
+        return redirect(url_for('admin_dashboard'))
+
     if request.method == 'POST':
         username = request.form.get('username').strip()
         password = request.form.get('password').strip()
@@ -94,6 +98,7 @@ def admin_login():
         conn.close()
         
         if user:
+            session.clear()
             session['user_id'] = user['id']
             session['username'] = user['username']
             session['role'] = user['role']
@@ -101,7 +106,7 @@ def admin_login():
         else:
             flash('Invalid login credentials, please try again.', 'error')
             
-    return '''
+    login_html = '''
     <!DOCTYPE html>
     <html>
     <head>
@@ -123,7 +128,6 @@ def admin_login():
             <h2>Small Industries Wing</h2>
             <h3>Government of Balochistan</h3>
             
-            <!-- Context Alerts Display Engine -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -147,29 +151,30 @@ def admin_login():
     </body>
     </html>
     '''
+    return render_template_string(login_html)
 
 @app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
     conn = get_db_connection()
     
-    # 1. Collect dynamic structural modifications tracking array
+    # Fetch all custom columns
     custom_cols = conn.execute('SELECT column_name FROM custom_columns').fetchall()
     col_names = [row['column_name'] for row in custom_cols]
     
-    # 2. Dynamic runtime table alterations parsing safety synchronization block
+    # Dynamic table alterations check
     for col in col_names:
         try:
             conn.execute(f'ALTER TABLE training_centers ADD COLUMN "{col}" TEXT')
             conn.commit()
         except sqlite3.OperationalError:
-            pass  # Structural mutation exists, passing pipeline execution safely
+            pass
             
-    # 3. Select complete training record row set matrix arrays
+    # Fetch all rows
     centers = conn.execute('SELECT * FROM training_centers').fetchall()
     conn.close()
     
-    return render_template('dashboard.html', centers=centers, custom_columns=col_names, user_role=session.get('role'))
+    return render_template('dashboard.html', centers=centers, custom_columns=col_names, user_role=session.get('role', 'viewer'))
 
 @app.route('/admin/add_center', methods=['POST'])
 @admin_required
@@ -185,7 +190,6 @@ def add_center():
     fields = ['s_no', 'ddo_code', 'center_name', 'status', 'type', 'ddo_name']
     values = [s_no, ddo_code, center_name, status, ctype, ddo_name]
     
-    # Process dynamically inserted metadata schema inputs safely
     custom_cols = conn.execute('SELECT column_name FROM custom_columns').fetchall()
     for col in custom_cols:
         col_name = col['column_name']
@@ -198,6 +202,7 @@ def add_center():
     conn.execute(f'INSERT INTO training_centers ({field_str}) VALUES ({placeholders})', values)
     conn.commit()
     conn.close()
+    flash('Training center record saved successfully.', 'success')
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/add_column', methods=['POST'])
@@ -209,15 +214,15 @@ def add_column():
         try:
             conn.execute('INSERT INTO custom_columns (column_name) VALUES (?)', (column_name,))
             conn.commit()
+            flash(f'Column "{column_name}" added successfully.', 'success')
         except sqlite3.IntegrityError:
-            pass # Avoid duplicate custom headers
+            flash('This column name already exists.', 'error')
         conn.close()
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/logout')
 def logout():
     session.clear()
-    flash('You have been logged out successfully.', 'info')
     return redirect(url_for('admin_login'))
 
 if __name__ == '__main__':
