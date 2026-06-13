@@ -1,10 +1,11 @@
 import os
+import random
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'siw_balochistan_secure_key_9911')
+app.secret_key = os.environ.get('SECRET_KEY', 'siw_balochistan_secure_prod_key_2026')
 
-# --- FAILSAFE DATABASE ENVIRONMENT ---
+# --- ROBUST FAILSAFE DATABASE ROUTING ENGINE ---
 RAW_DATABASE_URL = os.environ.get('DATABASE_URL', '')
 if not RAW_DATABASE_URL:
     DATABASE_URI = 'sqlite:///siw_balochistan_enterprise.db'
@@ -20,135 +21,128 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
 
-# --- ENTERPRISE SYSTEM DATABASE MODELS ---
-
+# --- PRODUCTION DATA SCHEMAS & TABLES ---
 class TrainingCenter(db.Model):
     __tablename__ = 'siw_centers'
     s_no = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ddo_code = db.Column(db.String(50), unique=True, nullable=False)
     center_name = db.Column(db.String(250), nullable=False)
-    status = db.Column(db.String(50), nullable=False)          # Functional / Non-Functional
-    governance_type = db.Column(db.String(50), nullable=False)  # Govt / Private
+    status = db.Column(db.String(50), default='Functional')  # Functional / Non-Functional
+    governance_type = db.Column(db.String(50), default='Govt')  # Govt / Private
     ddo_name = db.Column(db.String(200), nullable=False)
     extra_data = db.Column(db.JSON, default=dict)
 
-class UserAccount(db.Model):
-    __tablename__ = 'siw_users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
-    role = db.Column(db.String(50), nullable=False)             # 'admin' or 'ddo'
-    assigned_ddo_code = db.Column(db.String(50), nullable=True) # Maps DDO users to their center
-
 class Trainee(db.Model):
     __tablename__ = 'siw_trainees'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    special_id = db.Column(db.String(50), unique=True, nullable=False) # Auto-generated Unique ID
-    fullname = db.Column(db.String(200), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    trainee_id = db.Column(db.String(100), unique=True, nullable=False) # SIW-2026-XXXX
+    name = db.Column(db.String(200), nullable=False)
     cnic = db.Column(db.String(20), nullable=False)
-    trade_course = db.Column(db.String(150), nullable=False)
-    ddo_code = db.Column(db.String(50), nullable=False)         # Center where enrolled
-    enrollment_date = db.Column(db.String(50), nullable=False)
+    trade = db.Column(db.String(150), nullable=False)
+    allocated_center_code = db.Column(db.String(50), nullable=False)
+    verification_status = db.Column(db.String(50), default='Pending Review')
 
-class DocumentRoute(db.Model):
+class DocumentRegistry(db.Model):
     __tablename__ = 'siw_documents'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(250), nullable=False)
-    direction = db.Column(db.String(100), nullable=False)       # 'Directorate to Center' or 'Center to Directorate'
-    target_ddo_code = db.Column(db.String(50), nullable=False)
-    document_date = db.Column(db.String(50), nullable=False)
-    status = db.Column(db.String(50), default='Pending')
+    direction = db.Column(db.String(100), nullable=False) # 'directorate_to_center' or 'center_to_directorate'
+    title = db.Column(db.String(300), nullable=False)
+    reference_no = db.Column(db.String(100), nullable=False)
+    origin_center_code = db.Column(db.String(50), nullable=False) # DDO code mapping identifier
 
-# Dynamic table schema state columns mapping tracking array
+class DDOUser(db.Model):
+    __tablename__ = 'siw_ddo_users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False) # Production Plain-Hash Fallback
+    allocated_ddo_code = db.Column(db.String(50), nullable=False)
+
+# Track custom headers persistently
 DYNAMIC_COLUMNS = ['S.No.', 'DDO Code', 'Name of Center', 'Functional/Non-Functional', 'Govt/Private', 'DDO Name']
 
-# --- APPLICATIVE ACCESS CONTEXT ROUTES ---
+# --- WEB FLOW ENDPOINTS & ROUTING CONTROLLERS ---
 
 @app.route('/')
-def public_enrollment():
-    # Public Trainee Enrollment Form view (Default Landing)
-    centers = TrainingCenter.query.filter_by(status='Functional').all()
-    return render_template('dashboard.html', view='public', centers=centers)
+def index():
+    # Public facing workspace containing Registration Module + Secure Gateway Portals
+    centers = TrainingCenter.query.all()
+    return render_template('dashboard.html', view_context='public_enrollment', centers=centers, columns=DYNAMIC_COLUMNS)
 
-@app.route('/enroll-trainee', methods=['POST'])
-def enroll_trainee():
-    fullname = request.form.get('fullname', '').strip()
+@app.route('/public-register', methods=['POST'])
+def public_register():
+    name = request.form.get('name', '').strip()
     cnic = request.form.get('cnic', '').strip()
-    trade_course = request.form.get('trade_course')
-    ddo_code = request.form.get('ddo_code')
-    import datetime
-    today_str = datetime.date.today().strftime("%Y-%m-%d")
-
-    # Generate next sequential Special ID assignment safely
-    total_count = Trainee.query.count()
-    special_id = f"SIW-{datetime.date.today().year}-{1001 + total_count}"
-
-    new_trainee = Trainee(
-        special_id=special_id, fullname=fullname, cnic=cnic,
-        trade_course=trade_course, ddo_code=ddo_code, enrollment_date=today_str
-    )
-    db.session.add(new_trainee)
-    db.session.commit()
+    trade = request.form.get('trade', '').strip()
+    center_code = request.form.get('center_code', '').strip()
     
-    flash(f"Enrollment Successful! Your Unique Trainee Special ID is: {special_id}", "success")
-    return redirect(url_for('public_enrollment'))
+    if name and cnic and center_code:
+        # Generate clean sequential randomized ID parameters: SIW-2026-XXXX
+        generated_id = f"SIW-2026-{random.randint(1000, 9999)}"
+        new_student = Trainee(
+            trainee_id=generated_id, name=name, cnic=cnic, trade=trade, allocated_center_code=center_code
+        )
+        db.session.add(new_student)
+        db.session.commit()
+        flash(f"Registration Submitted Successfully! Your Special ID is: {generated_id}", "success")
+    else:
+        flash("Registration failed. Please complete all field entry points.", "danger")
+    return redirect(url_for('index'))
 
-@app.route('/login', methods=['POST'])
-def auth_login():
+@app.route('/login-gateway', methods=['POST'])
+def login_gateway():
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
-    user = UserAccount.query.filter_by(username=username, password=password).first()
     
-    if user:
-        session['user_id'] = user.id
-        session['username'] = user.username
-        session['role'] = user.role
-        session['assigned_ddo_code'] = user.assigned_ddo_code
-        return redirect(url_for('portal_dashboard'))
-    
-    flash("Invalid Identification Credentials. Access Refused.", "danger")
-    return redirect(url_for('public_enrollment'))
+    if username == 'admin' and password == 'admin123':
+        session['user_role'] = 'admin'
+        session['user_identity'] = 'Super Directorate'
+        return redirect(url_for('admin_panel'))
+        
+    ddo_check = DDOUser.query.filter_by(username=username, password=password).first()
+    if ddo_check:
+        session['user_role'] = 'ddo'
+        session['user_identity'] = ddo_check.allocated_ddo_code
+        return redirect(url_for('ddo_panel'))
+        
+    flash("Invalid Authorization Credentials.", "danger")
+    return redirect(url_for('index'))
 
 @app.route('/logout')
-def auth_logout():
+def logout():
     session.clear()
-    return redirect(url_for('public_enrollment'))
+    return redirect(url_for('index'))
 
-@app.route('/portal')
-def portal_dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('public_enrollment'))
-        
-    role = session.get('role')
-    assigned_ddo = session.get('assigned_ddo_code')
+# --- AUTHENTICATED ACCESS DOMAINS ---
 
-    # Security Query Filters based on Account Access Roles
-    if role == 'admin':
-        centers = TrainingCenter.query.order_by(TrainingCenter.s_no.asc()).all()
-        trainees = Trainee.query.all()
-        users = UserAccount.query.filter(UserAccount.role != 'admin').all()
-        docs = DocumentRoute.query.all()
-    else:
-        # Strict DDO isolation: only load data belonging to their assigned DDO Code
-        centers = TrainingCenter.query.filter_by(ddo_code=assigned_ddo).all()
-        trainees = Trainee.query.filter_by(ddo_code=assigned_ddo).all()
-        users = []
-        docs = DocumentRoute.query.filter_by(target_ddo_code=assigned_ddo).all()
+@app.route('/admin-portal')
+def admin_panel():
+    if session.get('user_role') != 'admin':
+        return "Unauthorized Access Area.", 403
+    centers = TrainingCenter.query.order_by(TrainingCenter.s_no.asc()).all()
+    trainees = Trainee.query.all()
+    documents = DocumentRegistry.query.all()
+    ddo_users = DDOUser.query.all()
+    return render_template('dashboard.html', view_context='admin_dashboard', centers=centers, trainees=trainees, documents=documents, ddo_users=ddo_users, columns=DYNAMIC_COLUMNS)
 
-    return render_template(
-        'dashboard.html', view='portal', role=role, centers=centers, 
-        columns=DYNAMIC_COLUMNS, trainees=trainees, users=users, docs=docs, assigned_ddo=assigned_ddo
-    )
+@app.route('/ddo-portal')
+def ddo_panel():
+    if session.get('user_role') != 'ddo':
+        return "Unauthorized Access Area.", 403
+    ddo_code = session.get('user_identity')
+    center_info = TrainingCenter.query.filter_by(ddo_code=ddo_code).first()
+    assigned_trainees = Trainee.query.filter_by(allocated_center_code=ddo_code).all()
+    shared_documents = DocumentRegistry.query.filter((DocumentRegistry.origin_center_code == ddo_code) | (DocumentRegistry.direction == 'directorate_to_center')).all()
+    return render_template('dashboard.html', view_context='ddo_dashboard', center=center_info, trainees=assigned_trainees, documents=shared_documents)
 
-# --- ADMIN SYSTEM UTILITIES CONTROL ENDPOINTS ---
+# --- ENGINE DATA ALTERATION SUB-ENDPOINTS ---
 
 @app.route('/add-center', methods=['POST'])
 def add_center():
-    if session.get('role') != 'admin': return "Access Unauthorised", 403
+    if session.get('user_role') != 'admin': return "Forbidden", 403
     ddo_code = request.form.get('ddo_code', '').strip()
     center_name = request.form.get('center_name', '').strip()
-    status = request.form.get('status')
-    governance_type = request.form.get('governance_type')
+    status = request.form.get('status', 'Functional')
+    governance_type = request.form.get('governance_type', 'Govt')
     ddo_name = request.form.get('ddo_name', '').strip()
     
     extra_fields = {}
@@ -156,64 +150,49 @@ def add_center():
         form_key = f"extra_{col.lower().replace(' ', '_')}"
         extra_fields[col] = request.form.get(form_key, '').strip()
 
-    new_center = TrainingCenter(
-        ddo_code=ddo_code, center_name=center_name, status=status,
-        governance_type=governance_type, ddo_name=ddo_name, extra_data=extra_fields
-    )
+    new_center = TrainingCenter(ddo_code=ddo_code, center_name=center_name, status=status, governance_type=governance_type, ddo_name=ddo_name, extra_data=extra_fields)
     db.session.add(new_center)
     db.session.commit()
-    return redirect(url_for('portal_dashboard'))
+    return redirect(url_for('admin_panel'))
 
 @app.route('/add-column', methods=['POST'])
 def add_column():
-    if session.get('role') != 'admin': return "Access Unauthorised", 403
+    if session.get('user_role') != 'admin': return "Forbidden", 403
     col_name = request.form.get('column_name', '').strip()
     if col_name and col_name not in DYNAMIC_COLUMNS:
         DYNAMIC_COLUMNS.append(col_name)
-    return redirect(url_for('portal_dashboard'))
+    return redirect(url_for('admin_panel'))
 
-@app.route('/create-ddo-user', methods=['POST'])
-def create_ddo_user():
-    if session.get('role') != 'admin': return "Access Unauthorised", 403
+@app.route('/create-ddo-account', methods=['POST'])
+def create_ddo_account():
+    if session.get('user_role') != 'admin': return "Forbidden", 403
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
-    ddo_code = request.form.get('ddo_code')
+    ddo_code = request.form.get('ddo_code', '').strip()
     
-    new_user = UserAccount(username=username, password=password, role='ddo', assigned_ddo_code=ddo_code)
-    db.session.add(new_user)
-    db.session.commit()
-    flash(f"User access created for DDO Code: {ddo_code}", "success")
-    return redirect(url_for('portal_dashboard'))
+    if username and password and ddo_code:
+        new_user = DDOUser(username=username, password=password, allocated_ddo_code=ddo_code)
+        db.session.add(new_user)
+        db.session.commit()
+    return redirect(url_for('admin_panel'))
 
-@app.route('/route-document', methods=['POST'])
-def route_document():
-    if 'user_id' not in session: return "Access Unauthorised", 403
-    title = request.form.get('title', '').strip()
+@app.route('/dispatch-document', methods=['POST'])
+def dispatch_document():
+    if not session.get('user_role'): return "Forbidden", 403
     direction = request.form.get('direction')
-    import datetime
-    today_str = datetime.date.today().strftime("%Y-%m-%d")
+    title = request.form.get('title', '').strip()
+    ref_no = request.form.get('ref_no', '').strip()
     
-    if session.get('role') == 'admin':
-        target_ddo_code = request.form.get('target_ddo_code')
-    else:
-        target_ddo_code = session.get('assigned_ddo_code')
-        direction = 'Center to Directorate' # Enforce direction for DDOs
-
-    new_doc = DocumentRoute(title=title, direction=direction, target_ddo_code=target_ddo_code, document_date=today_str)
+    center_code = session.get('user_identity') if session.get('user_role') == 'ddo' else request.form.get('center_code', 'DIRECTORATE')
+    
+    new_doc = DocumentRegistry(direction=direction, title=title, reference_no=ref_no, origin_center_code=center_code)
     db.session.add(new_doc)
     db.session.commit()
-    flash("Document filed and routed successfully.", "success")
-    return redirect(url_for('portal_dashboard'))
+    
+    return redirect(url_for('admin_panel') if session.get('user_role') == 'admin' else url_for('ddo_panel'))
 
-# --- FORCE STRUCTURAL SYSTEM SEED SEUQUENCE ARCHITECTURE ---
 with app.app_context():
     db.create_all()
-    # Auto-seed core default system Master Admin User Account if clean boot environment
-    if not UserAccount.query.filter_by(username='admin').first():
-        admin_seed = UserAccount(username='admin', password='siwadminportalbalochistan', role='admin')
-        db.session.add(admin_seed)
-        db.session.commit()
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
