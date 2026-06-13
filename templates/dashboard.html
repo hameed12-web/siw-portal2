@@ -7,39 +7,36 @@
     <style>
         :root { --primary: #065f46; --primary-dark: #064e3b; --secondary: #1e293b; --bg: #f8fafc; --card-bg: #ffffff; --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
-        header { background-color: var(--primary); color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary-dark); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .brand-title { font-size: 24px; font-weight: 800; letter-spacing: 0.5px; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
+        header { background-color: var(--primary); color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary-dark); }
+        .brand-title { font-size: 24px; font-weight: 800; }
         .brand-sub { font-size: 13px; color: #a7f3d0; margin-top: 2px; }
-        main { max-w: 1200px; margin: 0 auto; padding: 30px 20px; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
-        .form-group label { font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; }
-        input, select { padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; background: #fff; }
+        main { max-w: 1200px; margin: 30px auto; padding: 0 20px; }
+        .grid-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px; color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .form-group label { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; }
+        input, select, textarea { padding: 11px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; background: #fff; width: 100%; }
         input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(6,95,70,0.1); }
-        .btn { padding: 12px 24px; font-size: 14px; font-weight: 700; border-radius: 8px; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn { padding: 11px 20px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; border: none; text-align: center; text-decoration: none; display: inline-block; }
         .btn-primary { background-color: var(--primary); color: white; }
         .btn-primary:hover { background-color: var(--primary-dark); }
-        .btn-secondary { background-color: #475569; color: white; }
-        .btn-secondary:hover { background-color: #334155; }
-        .alert { padding: 15px; border-radius: 8px; font-weight: 600; margin-bottom: 25px; font-size: 14px; border: 1px solid transparent; }
-        .alert-success { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-        .alert-danger { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
-        .nav-container { display: flex; gap: 12px; border-bottom: 2px solid var(--border); margin-bottom: 25px; }
-        .tab-btn { padding: 12px 24px; font-size: 14px; font-weight: 700; border: none; background: none; cursor: pointer; color: var(--text-muted); border-bottom: 3px solid transparent; transition: all 0.2s; text-transform: uppercase; }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
-        .portal-section { display: none; } .portal-section.active { display: block; }
-        .table-responsive { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
-        th { background: #f1f5f9; color: #475569; font-weight: 700; padding: 14px 18px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 11px; }
-        td { padding: 14px 18px; border-bottom: 1px solid var(--border); color: #334155; }
-        tr:hover td { background-color: #f8fafc; }
-        .badge { padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 50px; text-transform: uppercase; display: inline-block; }
-        .badge-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .badge-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-        .badge-info { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .btn-secondary { background-color: var(--secondary); color: white; }
+        .btn-logout { background-color: #b91c1c; color: white; font-size: 12px; }
+        .flash-msg { padding: 14px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; font-size: 14px; }
+        .flash-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .flash-danger { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; margin-top: 10px; }
+        th { background-color: #f1f5f9; color: #475569; font-weight: 700; padding: 12px 14px; border: 1px solid var(--border); text-transform: uppercase; font-size: 11px; }
+        td { padding: 12px 14px; border: 1px solid var(--border); color: #334155; }
+        .badge { padding: 3px 8px; font-size: 10px; font-weight: 700; border-radius: 50px; text-transform: uppercase; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-info { background: #e0f2fe; color: #0369a1; }
+        .tab-btn-group { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
+        .tab-link { padding: 8px 16px; border: none; background: none; font-weight: 600; cursor: pointer; color: var(--text-muted); }
+        .tab-link.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+        .hidden-section { display: none; }
     </style>
 </head>
 <body>
@@ -47,98 +44,108 @@
     <header>
         <div>
             <div class="brand-title">Small Industries Wing, Balochistan</div>
-            <div class="brand-sub">Government of Balochistan — Administrative Management Network</div>
+            <div class="brand-sub">Directorate General of Small Industries Wing — Portal Management Cluster</div>
         </div>
+        {% if session.get('user_role') %}
         <div>
-            {% if session.get('user_id') %}
-            <a href="/logout" class="btn btn-secondary" style="font-size:12px; padding:8px 16px;">Logout ({{ session.get('username') }})</a>
-            {% else %}
-            <button class="btn btn-primary" style="background:#047857; font-size:12px; padding:8px 16px; border:1px solid #065f46;">🔒 Portal Systems</button>
-            {% endif %}
+            <span style="font-weight:700; margin-right:15px; font-size:14px;">Connected: {{ session.get('user_identity') }}</span>
+            <a href="/logout" class="btn btn-logout">Sign Out</a>
         </div>
+        {% endif %}
     </header>
 
     <main>
-        <!-- Flash Alert Message Display Block -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, msg in messages %}
-                    <div class="alert alert-{{ category }}">{{ msg }}</div>
+                    <div class="flash-msg flash-{{ category }}">{{ msg }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <!-- VIEW 1: PUBLIC TRAINEE ENROLLMENT DASHBOARD INTERFACE -->
-        {% if view == 'public' %}
-        <div class="card">
-            <div class="card-title">Public Trainee Enrollment Dashboard Form</div>
-            <form action="/enroll-trainee" method="POST">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Full Name of Applicant</label>
-                        <input type="text" name="fullname" placeholder="Enter Full Name" required />
-                    </div>
-                    <div class="form-group">
-                        <label>CNIC Number / B-Form</label>
-                        <input type="text" name="cnic" placeholder="xxxxx-xxxxxxx-x" required />
-                    </div>
-                    <div class="form-group">
-                        <label>Select Intended Trade Course Program</label>
-                        <select name="trade_course" required>
-                            <option value="Computer Software Applications">Computer Software Applications</option>
-                            <option value="Mobile Phone Repairing Tech">Mobile Phone Repairing Tech</option>
-                            <option value="Industrial Electrical Technician">Industrial Electrical Technician</option>
-                            <option value="Textile Designing &amp; Embroidery">Textile Designing &amp; Embroidery</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Select Training Center Location</label>
-                        <select name="ddo_code" required>
-                            {% for center in centers %}
-                            <option value="{{ center.ddo_code }}">{{ center.center_name }} ({{ center.ddo_code }})</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+        <!-- VIEW PATH 1: PUBLIC TRAINEES ENROLLMENT WORKSPACE -->
+        {% if view_context == 'public_enrollment' %}
+        <div class="grid-layout">
+            <div>
+                <div class="card">
+                    <div class="card-title">Public Trainee Registration Engine</div>
+                    <form action="/public-register" method="POST">
+                        <div class="form-group">
+                            <label>Full Name of Trainee</label>
+                            <input type="text" name="name" placeholder="Enter Full Applicant Name" required />
+                        </div>
+                        <div class="form-group">
+                            <label>National Identity Card Number (CNIC / B-Form)</label>
+                            <input type="text" name="cnic" placeholder="xxxxx-xxxxxxx-x" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Intended Trade Discipline Course</label>
+                            <select name="trade" required>
+                                <option value="Computer Software Applications">Computer Software Applications</option>
+                                <option value="Tailoring &amp; Apparel Design">Tailoring &amp; Apparel Design</option>
+                                <option value="Metal Welding Technology">Metal Welding Technology</option>
+                                <option value="Embroidery &amp; Local Handicrafts">Embroidery &amp; Local Handicrafts</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Target Operational Training Center</label>
+                            <select name="center_code" required>
+                                {% for center in centers %}
+                                <option value="{{ center.ddo_code }}">{{ center.center_name }} ({{ center.ddo_code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%; padding:14px;">Submit Enrollment Application File</button>
+                    </form>
                 </div>
-                <div style="margin-top: 20px;">
-                    <button type="submit" class="btn btn-primary">Submit Enrollment Application</button>
+            </div>
+
+            <div>
+                <div class="card" style="border-top: 4px solid var(--secondary);">
+                    <div class="card-title">Administrative Access Gateway</div>
+                    <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Secure environment interface for centralized directorate operations and mapped training center DDO networks.</p>
+                    <form action="/login-gateway" method="POST">
+                        <div class="form-group">
+                            <label>System Account Username</label>
+                            <input type="text" name="username" placeholder="Enter Username" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Access Security Key Password</label>
+                            <input type="password" name="password" placeholder="••••••••" required />
+                        </div>
+                        <button type="submit" class="btn btn-secondary" style="width:100%;">Verify and Connect Session</button>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
 
-        <!-- ADMIN/DDO RECORD CHECK LOGIN CONTAINER SECTION -->
-        <div class="card" style="max-width: 500px; margin: 40px auto 0 auto; border-top: 4px solid var(--primary);">
-            <div class="card-title" style="text-align:center;">Admin Access &amp; Trainees Record Login</div>
-            <form action="/login" method="POST">
-                <div class="form-group">
-                    <label>Username / DDO Identity Handle</label>
-                    
-                </div>
-                <div class="form-group">
-                    <label>Security Password</label>
-                    <input type="password" name="password" placeholder="••••••••••••" required />
-                </div>
-                <button type="submit" class="btn btn-secondary" style="width:100%; padding:14px;">Verify Credentials &amp; Establish Session</button>
-            </form>
+        <!-- VIEW PATH 2: SUPER DIRECTORATE CENTRAL CONTROL PANEL -->
+        {% elif view_context == 'admin_dashboard' %}
+        <div class="tab-btn-group">
+            <button class="tab-link active" onclick="toggleView('panel-centers', this)">🏫 Manage Center Formations</button>
+            <button class="tab-link" onclick="toggleView('panel-trainees', this)">👥 Enrolled Trainees Dossier</button>
+            <button class="tab-link" onclick="toggleView('panel-docs', this)">📁 Twin-Directional Document Desk</button>
+            <button class="tab-link" onclick="toggleView('panel-ddos', this)">🔑 Create DDO Access Nodes</button>
         </div>
 
-        <!-- VIEW 2: AUTHENTICATED ADMIN / DDO CONTROL SYSTEM PORTAL WORKSPACE -->
-        {% elif view == 'portal' %}
-        <div class="nav-container">
-            <button class="tab-btn active" onclick="switchPortalTab('centers-pane', this)">🏫 Centers Registry</button>
-            <button class="tab-btn" onclick="switchPortalTab('trainees-pane', this)">👥 Trainees Records</button>
-            <button class="tab-btn" onclick="switchPortalTab('documents-pane', this)">📁 Directorate Document Routing</button>
-            {% if role == 'admin' %}
-            <button class="tab-btn" onclick="switchPortalTab('access-pane', this)">⚙️ DDO Access Controls</button>
-            {% endif %}
-        </div>
-
-        <!-- PANE A: TRAINING CENTERS VIEW -->
-        <div id="centers-pane" class="portal-section active">
-            <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
-                <div>
-                    <h3 style="font-size:18px; font-weight:800;">Centers Footprint Index</h3>
-                    <p style="font-size:12px; color:var(--text-muted);">Operational mapping records for assigned workspace matrix.</p>
+        <!-- Tab Panel: Centers Info Base -->
+        <div id="panel-centers" class="tab-content">
+            <div class="card">
+                <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Active Administrative Matrix Framework</span>
+                    <form action="/add-column" method="POST" style="display:flex; gap:5px;">
+                        <input type="text" name="column_name" placeholder="Column Name..." style="padding:5px;" required />
+                        <button type="submit" class="btn btn-primary" style="padding:5px 10px; font-size:11px;">+ Extend Column</button>
+                    </form>
                 </div>
-                {% if role == 'admin' %}
-                <form action="/add-column" method="POST" style="display:flex; gap:8px;">
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                {% for col in columns %} <th>{{ col }}</th> {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in centers %}
+                            <tr>
+                                <td>{{ c.s_no }}</td>
