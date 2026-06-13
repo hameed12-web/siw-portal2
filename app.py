@@ -4,31 +4,32 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# Fallback to local SQLite database if Render database URL isn't configured yet
+# 🟩 FIX: The standard variable name is DATABASE_URL on Render, 
+# but it must match exactly with SQLALCHEMY_DATABASE_URI inside Flask
 DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///siw_balochistan.db')
+
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-app.config['SQLALCHEMY_DATABASE_URL'] = DATABASE_URL
+# 🟩 FIX: Changed SQLALCHEMY_DATABASE_URL -> SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Database Model for dynamic training centers
+# Database Model for training centers
 class TrainingCenter(db.Model):
     __tablename__ = 'training_centers'
     
     s_no = db.Column(db.Integer, primary_key=True)
     ddo_code = db.Column(db.String(50), nullable=False)
     center_name = db.Column(db.String(200), nullable=False)
-    status = db.Column(db.String(50), nullable=False) # Functional/Non-Functional
-    center_type = db.Column(db.String(50), nullable=False) # Govt/Private
+    status = db.Column(db.String(50), nullable=False)
+    center_type = db.Column(db.String(50), nullable=False)
     ddo_name = db.Column(db.String(150), nullable=False)
-    
-    # Store any extra columns created dynamically by the admin as a dictionary
     extra_data = db.Column(db.JSON, default=dict)
 
-# Global variables to track dynamically added columns across page reloads
+# Track dynamic columns across session page reloads
 DYNAMIC_COLUMNS = ['S.No.', 'DDO Code', 'Name of Center', 'Functional/Non-Functional', 'Govt/Private', 'DDO Name']
 
 @app.route('/')
@@ -38,14 +39,12 @@ def index():
 
 @app.route('/add-center', methods=['POST'])
 def add_center():
-    # Capture standard fields
     ddo_code = request.form.get('ddo_code')
     center_name = request.form.get('center_name')
     status = request.form.get('status')
     center_type = request.form.get('center_type')
     ddo_name = request.form.get('ddo_name')
     
-    # Capture any custom column entries submitted
     extra_fields = {}
     for col in DYNAMIC_COLUMNS[6:]:
         form_key = f"extra_{col.lower().replace(' ', '_')}"
@@ -70,7 +69,6 @@ def add_column():
         DYNAMIC_COLUMNS.append(col_name)
     return redirect(url_for('index'))
 
-# Ensure database tables are created automatically on application start
 with app.app_context():
     db.create_all()
 
