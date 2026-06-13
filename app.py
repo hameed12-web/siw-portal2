@@ -1,15 +1,12 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
 # --- GUARANTEED FAILSAFE DATABASE SETUP ---
-# Render provisions postgres strings starting with 'postgres://' which fails in SQLAlchemy 3.x.
-# This block catches, sanitizes, and falls back to a stable SQLite cluster file if completely missing.
 RAW_DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 if not RAW_DATABASE_URL:
-    # Safe local fallback to completely eliminate the initialization 500 error
     DATABASE_URI = 'sqlite:///siw_balochistan_fallback.db'
 else:
     if RAW_DATABASE_URL.startswith("postgres://"):
@@ -20,7 +17,6 @@ else:
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Import inside context to ensure absolute stability during app declaration
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
 
@@ -44,9 +40,9 @@ DYNAMIC_COLUMNS = ['S.No.', 'DDO Code', 'Name of Center', 'Functional/Non-Functi
 def index():
     try:
         centers = TrainingCenter.query.order_by(TrainingCenter.s_no.asc()).all()
-        return render_template('admin.html', centers=centers, columns=DYNAMIC_COLUMNS)
+        # 🟩 FIX: Changed template call from admin.html to your existing dashboard.html
+        return render_template('dashboard.html', centers=centers, columns=DYNAMIC_COLUMNS)
     except Exception as e:
-        # Fallback view if database drops state mid-session
         return f"Database Synchronization Error: {str(e)}. Please check Render configurations.", 500
 
 @app.route('/add-center', methods=['POST'])
@@ -57,7 +53,6 @@ def add_center():
     governance_type = request.form.get('governance_type', 'Govt')
     ddo_name = request.form.get('ddo_name', '').strip()
     
-    # Process user added fields dynamically mapping keys
     extra_fields = {}
     for col in DYNAMIC_COLUMNS[6:]:
         form_key = f"extra_{col.lower().replace(' ', '_')}"
@@ -79,12 +74,10 @@ def add_center():
 @app.route('/add-column', methods=['POST'])
 def add_column():
     col_name = request.form.get('column_name', '').strip()
-    # Enforce safe naming validation filters
     if col_name and col_name not in DYNAMIC_COLUMNS:
         DYNAMIC_COLUMNS.append(col_name)
     return redirect(url_for('index'))
 
-# Force continuous initialization architecture sequence
 with app.app_context():
     db.create_all()
 
