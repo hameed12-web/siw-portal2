@@ -3,143 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Small Industries Wing, Balochistan</title>
-    <script src="https://tailwindcss.com"></script>
+    <title>Secure Administrative Control Dashboard — Small Industries Wing</title>
+    <!-- Direct Tailwind CSS CDN engine deployment layout injection -->
+    <link rel="stylesheet" href="https://jsdelivr.net">
+    <!-- FontAwesome Vector System for professional UI icons -->
+    <link rel="stylesheet" href="https://cloudflare.com">
 </head>
-<body class="bg-gray-100 text-gray-900 antialiased min-h-screen">
+<body class="bg-gray-100 font-sans antialiased text-gray-900 min-h-screen flex flex-col justify-between">
 
-    <!-- Top App Banner Branding Header Section -->
-    <header class="bg-emerald-800 text-white shadow-md border-b-4 border-emerald-950 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div>
-            <h1 class="text-2xl font-black tracking-wide">Small Industries Wing, Balochistan</h1>
-            <p class="text-xs text-emerald-200 font-medium">Government of Balochistan — Admin Access Management Portal</p>
-        </div>
-        <div class="bg-emerald-900 border border-emerald-700 rounded-full px-4 py-1.5 text-xs font-bold tracking-wider uppercase shadow-inner">
-            ⚡ Connected Live
+    <!-- Top Admin Banner Header Navigation Component Bar -->
+    <header class="bg-emerald-900 text-white shadow-md py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-user-shield text-2xl text-yellow-400 animate-pulse"></i>
+                <div>
+                    <h1 class="text-lg font-black tracking-wide">Small Industries Wing, Balochistan</h1>
+                    <p class="text-[10px] uppercase font-bold text-emerald-200 tracking-widest">Management Control & Infrastructure Registry Portal</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="/" class="px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-xs font-bold rounded-lg border border-emerald-600 transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-arrow-left"></i> Return to Intake Form
+                </a>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+    <!-- Main Workspace Dashboard Section Inner Area Block Wrapper -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 flex-grow">
         
-        <!-- Table Action Management Tools Header -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <!-- Application Control Core Label Matrix Component Banner -->
+        <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div>
-                <h2 class="text-lg font-bold text-gray-900">Training Centers Directory</h2>
-                <p class="text-xs text-gray-500">Live operational status overview updates.</p>
+                <h2 class="text-xl font-extrabold text-gray-900 tracking-tight">Privileged Management Control Matrix</h2>
+                <p class="text-xs text-gray-500 mt-1">Configure provincial training infrastructure nodes, manipulate active dataset schema tracking shapes, and audit live student applications.</p>
             </div>
-            
-            <!-- Column Appender Utility Engine Form -->
-            <form action="/add-column" method="POST" class="w-full md:w-auto flex flex-wrap gap-2">
-                <input 
-                    type="text" 
-                    name="column_name" 
-                    placeholder="New Dynamic Column Title..." 
-                    required 
-                    class="flex-1 md:w-64 border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none"
-                />
-                <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm px-5 py-2.5 rounded-lg tracking-wide transition shadow-sm">
-                    + Add Column
-                </button>
-            </form>
-        </div>
-
-        <!-- Dynamic Data Spreadsheet Table Workspace -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-8">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-                    <thead class="bg-gray-50 text-gray-700 font-bold uppercase tracking-wider text-xs border-b">
-                        <tr>
-                            {% for col in columns %}
-                            <th class="px-6 py-4 border-r last:border-r-0 border-gray-200 bg-gray-50 font-semibold">{{ col }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        {% for center in centers %}
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-600 bg-gray-50/50">{{ center.s_no }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap font-mono font-medium text-emerald-800">{{ center.ddo_code }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900">{{ center.center_name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide 
-                                    {{ 'bg-green-100 text-green-800 border border-green-200' if center.status == 'Functional' else 'bg-red-100 text-red-800 border border-red-200' }}">
-                                    {{ center.status }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap"><span class="font-medium">{{ center.governance_type }}</span></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ center.ddo_name }}</td>
-                            
-                            <!-- Dynamic rendering interface generator for custom extension values -->
-                            {% for col in columns[6:] %}
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600 italic bg-amber-50/20">
-                                {{ center.extra_data.get(col, '—') }}
-                            </td>
-                            {% endfor %}
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="{{ columns|length }}" class="px-6 py-16 text-center text-gray-400 font-medium italic">
-                                No infrastructure files recorded inside this node system database directory.
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Server Sync Online
+                </span>
             </div>
         </div>
 
-        <!-- Master Registry Update Creation Terminal Form Panel -->
-        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-            <h3 class="text-base font-bold uppercase tracking-wider text-gray-900 mb-4 border-b pb-2 border-gray-100">Add Training Center Record Entry</h3>
-            
-            <form action="/add-center" method="POST" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div class="flex flex-col">
-                    <label class="text-xs font-bold uppercase text-gray-600 mb-1.5 tracking-wide">DDO Code</label>
-                    <input type="text" name="ddo_code" required class="border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none bg-gray-50/50">
-                </div>
-                
-                <div class="flex flex-col">
-                    <label class="text-xs font-bold uppercase text-gray-600 mb-1.5 tracking-wide">Name of Center</label>
-                    <input type="text" name="center_name" required class="border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none bg-gray-50/50">
-                </div>
+        <!-- Master View System Management Navigation Category Tab Switches Header Bar Row -->
+        <div class="flex border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap gap-2">
+            <button id="tabBtnCenters" onclick="toggleWorkspaceAdminTab('centers')" class="px-5 py-3 text-sm font-bold border-b-2 border-emerald-800 text-emerald-900 transition flex items-center gap-2">
+                <i class="fa-solid fa-hotel text-xs"></i> 1. Training Centers Directory
+            </button>
+            <button id="tabBtnTrainees" onclick="toggleWorkspaceAdminTab('trainees')" class="px-5 py-3 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition flex items-center gap-2">
+                <i class="fa-solid fa-users text-xs"></i> 2. Live Registered Trainees Matrix
+            </button>
+        </div>
 
-                <div class="flex flex-col">
-                    <label class="text-xs font-bold uppercase text-gray-600 mb-1.5 tracking-wide">Functional / Non-Functional</label>
-                    <select name="status" required class="border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none bg-white">
-                        <option value="Functional">Functional</option>
-                        <option value="Non-Functional">Non-Functional</option>
-                    </select>
+        <!-- ==================== TAB CONTENT 1: TRAINING CENTERS LOG CORE ENGINE ==================== -->
+        <div id="workspaceContentCenters" class="space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Training Nodes Registry Sheet</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Extended row attributes array parameters inject fluidly inside current dataset instances.</p>
                 </div>
-
-                <div class="flex flex-col">
-                    <label class="text-xs font-bold uppercase text-gray-600 mb-1.5 tracking-wide">Govt / Private</label>
-                    <select name="governance_type" required class="border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none bg-white">
-                        <option value="Govt">Govt</option>
-                        <option value="Private">Private</option>
-                    </select>
-                </div>
-
-                <div class="flex flex-col">
-                    <label class="text-xs font-bold uppercase text-gray-600 mb-1.5 tracking-wide">DDO Name</label>
-                    <input type="text" name="ddo_name" required class="border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none bg-gray-50/50">
-                </div>
-
-                <!-- Dynamic runtime inputs for user custom appended headers -->
-                {% for col in columns[6:] %}
-                <div class="flex flex-col bg-amber-50/40 p-2.5 rounded-lg border border-dashed border-amber-200">
-                    <label class="text-xs font-bold uppercase text-amber-900 mb-1.5 tracking-wide">{{ col }} (Custom Field)</label>
-                    <input type="text" name="extra_{{ col.lower().replace(' ', '_') }}" class="border border-amber-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
-                </div>
-                {% endfor %}
-
-                <div class="md:col-span-2 lg:col-span-3 flex justify-end items-center pt-2">
-                    <button type="submit" class="w-full sm:w-auto bg-emerald-800 hover:bg-emerald-950 text-white font-bold px-8 py-3 rounded-lg shadow transition tracking-wide text-sm">
-                        Save Center Record
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="injectDynamicSchemaAttributeColumn()" class="w-full sm:w-auto px-4 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-emerald-950 font-extrabold text-xs rounded-lg transition flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-columns"></i> Add Extra Column
                     </button>
                 </div>
-            </form>
-        </div>
+            </div>
 
-    </main>
-</body>
-</html>
+            <!-- Responsive Dynamic Primary Table Engine Wrapper Card -->
+            <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse" id="adminCentersTable">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
+                                <th class="px-5 py-4 w-16">S.No.</th>
+                                <th class="px-5 py-4">DDO Code</th>
+                                <th class="px-5 py-4">Name of Center</th>
+                                <th class="px-5 py-4">Functional / Non-Functional</th>
+                                <th class="px-5 py-4">Govt / Private</th>
+                                <th class="px-5 py-4">DDO Name</th>
+                                <!-- Target Dynamic Element Marker Destination for JavaScript Append Engine Loops -->
+                                <th id="tableActionsEndHeader" class="px-5 py-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 text-sm font-semibold text-gray-700" id="centersTableBody">
+                            <!-- Data Row Model Record 1 -->
+                            <tr class="hover:bg-gray-50/60 transition">
+                                <td class="px-5 py-4 font-bold text-gray-400">1</td>
+                                <td class="px-5 py-4"><span class="bg-gray-100 border border-gray-200 font-mono text-xs px-2.5 py-1 rounded font-bold text-gray-600">QA-4052</span></td>
+                                <td class="px-5 py-4 text-emerald-950 font-bold">Vocational Training Institute, Quetta</td>
+                                <td class="px-5 py-4">
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200 inline-flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Functional
+                                    </span>
+                                </td>
+                                <td class="px-5 py-4"><span class="px-2.5 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 border">Govt</span></td>
+                                <td class="px-5 py-4 text-gray-600">Mr. Khan Baloch</td>
+                                <td class="px-5 py-4 text-right space-x-2 whitespace-nowrap">
+                                    <button class="text-emerald-800 hover:text-emerald-950 text-xs font-bold"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                                    <button class="text-red-600 hover:text-red-800 text-xs font-bold"><i class="fa-solid fa-trash"></i> Delete</button>
+                                </td>
+                            </tr>
+                            <!-- Data Row Model Record 2 -->
+                            <tr class="hover:bg-gray-50/60 transition">
+                                <td class="px-5 py-4 font-bold text-gray-400">2</td>
+                                <td class="px-5 py-4"><span class="bg-gray-100 border border-gray-200 font-mono text-xs px-2.5 py-1 rounded font-bold text-gray-600">WZ-2219</span></td>
+                                <td class="px-5 py-4 text-emerald-950 font-bold">Handicrafts Development Centre, Khuzdar</td>
+                                <td class="px-5 py-4">
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200 inline-flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Functional
+                                    </span>
+                                </td>
+                                <td class="px-5 py-4"><span class="px-2.5 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 border">Govt</span></td>
+                                <td class="px-5 py-4 text-gray-600">Sarfraz Ahmed</td>
+                                <td class="px-5 py-4 text-right space-x-2 whitespace-nowrap">
+                                    <button class="text-emerald-800 hover:text-emerald-950 text-xs font-bold"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                                    <button class="text-red-600 hover:text-red-800 text-xs font-bold"><i class="fa-solid fa-trash"></i> Delete</button>
+                                </td>
+                            </tr>
+                            <!-- Data Row Model Record 3 -->
+                            <tr class="hover:bg-gray-50/60 transition">
+                                <td class="px-5 py-4 font-bold text-gray-400">3</td>
