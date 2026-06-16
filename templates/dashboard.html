@@ -3,121 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>National Trainee Enrollment & Registration Portal - SIW</title>
-    <!-- Tailwind CSS Engine loaded to guarantee layout rendering -->
-    <script src="https://tailwindcss.com"></script>
+    <title>National Trainee Enrollment & Registration Portal — SIW Balochistan</title>
+    <!-- Direct external CDN fallback setup to prevent styling breakages on web render builds -->
+    <link rel="stylesheet" href="https://jsdelivr.net">
     <link rel="stylesheet" href="https://cloudflare.com">
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen pb-12">
+<body class="bg-gray-100 font-sans antialiased text-gray-900 min-h-screen flex flex-col justify-between">
 
-    <!-- PRIMARY EMBEDDED MAIN APPLICATION CONTENT INNER HOLDER CONTAINER -->
-    <div class="max-w-4xl mx-auto my-8 px-4 w-full">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+    <!-- Premium Administrative Intake Application Wrapper Card Container -->
+    <div class="max-w-4xl w-full mx-auto my-10 px-4">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
             
-            <!-- HEADER LOGO BANNER MODULE BLOCK -->
-            <div class="bg-[#064e3b] text-white p-6 sm:p-10 text-center border-b-[6px] border-amber-500">
-                <p class="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">Government of Balochistan</p>
-                <h1 class="text-xl sm:text-3xl font-extrabold uppercase tracking-wide">National Trainee Enrollment & Registration Portal</h1>
-                <p class="text-xs sm:text-sm text-emerald-200 mt-2 font-medium">Official Information Management Intake System — Small Industries Wing, Balochistan Portal</p>
+            <!-- Top Banner Header Setup mimicking institutional portal design frameworks -->
+            <div class="bg-emerald-900 text-white px-6 py-10 text-center border-b-[6px] border-yellow-500 relative">
+                <div class="absolute top-4 left-6 text-yellow-400 opacity-20 hidden md:block">
+                    <i class="fa-solid fa-building-shield text-6xl"></i>
+                </div>
+                <span class="text-xs font-bold text-yellow-400 tracking-widest uppercase block mb-1">Government of Balochistan</span>
+                <h1 class="text-2xl sm:text-3xl font-black tracking-wide uppercase leading-tight">National Trainee Enrollment & Registration Portal</h1>
+                <p class="text-sm text-emerald-100/90 font-medium mt-3 max-w-2xl mx-auto">
+                    Official Information Management Intake System — Small Industries Wing, Balochistan Portal
+                </p>
             </div>
 
-            <!-- THE SYSTEM FORM BLOCK -->
-            <form action="/submit" method="POST" class="p-6 sm:p-10 space-y-8">
+            <!-- Data Submission Entry Area Form Fields Block -->
+            <form action="/submit-enrollment" method="POST" class="p-6 sm:p-10 space-y-8">
                 
                 <!-- SECTION A: CENTER ALLOCATION DETAILS -->
-                <div class="space-y-4">
-                    <h2 class="text-base font-bold text-[#064e3b] border-b border-slate-200 pb-1 uppercase tracking-wide">A. Center Allocation Details</h2>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Center / DDO Unit Name *</label>
-                        <input type="text" name="center_unit_name" required placeholder="Specify designated training center name" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
+                <div class="bg-gray-50/60 p-5 rounded-xl border border-gray-100">
+                    <h2 class="text-sm font-bold text-emerald-900 tracking-wider uppercase border-b border-gray-200 pb-2 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot text-emerald-700"></i> A. CENTER ALLOCATION DETAILS
+                    </h2>
+                    <div class="space-y-1">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">Center / DDO Unit Name <span class="text-red-500">*</span></label>
+                        <input type="text" name="center_unit_name" required placeholder="Specify designated training center name" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition bg-white text-sm shadow-sm">
                     </div>
                 </div>
 
                 <!-- SECTION B: PERSONAL PROFILE PARTICULARS -->
-                <div class="space-y-4">
-                    <h2 class="text-base font-bold text-[#064e3b] border-b border-slate-200 pb-1 uppercase tracking-wide">B. Personal Profile Particulars</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Full Name (As per CNIC) *</label>
-                            <input type="text" name="full_name" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
+                <div class="bg-gray-50/60 p-5 rounded-xl border border-gray-100">
+                    <h2 class="text-sm font-bold text-emerald-900 tracking-wider uppercase border-b border-gray-200 pb-2 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-id-card text-emerald-700"></i> B. PERSONAL PROFILE PARTICULARS
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">Full Name (As per CNIC) <span class="text-red-500">*</span></label>
+                            <input type="text" name="full_name" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition bg-white text-sm shadow-sm">
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Father Name *</label>
-                            <input type="text" name="father_name" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">CNIC Number *</label>
-                            <input type="text" name="cnic_number" placeholder="XXXXX-XXXXXXX-X" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Mobile Contact Number *</label>
-                            <input type="text" name="mobile_contact" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">Father Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="father_name" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition bg-white text-sm shadow-sm">
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Session Batch Cohort *</label>
-                            <input type="text" name="session_batch" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-4">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">CNIC Number <span class="text-red-500">*</span></label>
+                            <input type="text" name="cnic_number" placeholder="XXXXX-XXXXXXX-X" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition bg-white text-sm shadow-sm font-mono tracking-wider">
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Email Address *</label>
-                            <input type="email" name="email_address" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">Mobile Contact Number <span class="text-red-500">*</span></label>
+                            <input type="text" name="mobile_contact" placeholder="e.g. 03331234567" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition bg-white text-sm shadow-sm">
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Assigned Course Module *</label>
-                            <input type="text" name="assigned_course" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-4">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">Session Batch Cohort <span class="text-red-500">*</span></label>
+                            <input type="text" name="session_batch" placeholder="e.g. 2026-A" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition bg-white text-sm shadow-sm">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">Email Address <span class="text-red-500">*</span></label>
+                            <input type="email" name="email_address" placeholder="name@domain.com" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition bg-white text-sm shadow-sm">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">Assigned Course Module <span class="text-red-500">*</span></label>
+                            <input type="text" name="assigned_course" placeholder="Specify course profile" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition bg-white text-sm shadow-sm">
                         </div>
                     </div>
                 </div>
 
                 <!-- SECTION C: STATUS AND DEMOGRAPHICS CLASSIFICATION -->
-                <div class="space-y-4">
-                    <h2 class="text-base font-bold text-[#064e3b] border-b border-slate-200 pb-1 uppercase tracking-wide">C. Status and Demographics Classification</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Gender Classification *</label>
-                            <select name="gender_classification" required class="w-full px-4 py-2.5 border border-slate-300 bg-white rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm">
+                <div class="bg-gray-50/60 p-5 rounded-xl border border-gray-100">
+                    <h2 class="text-sm font-bold text-emerald-900 tracking-wider uppercase border-b border-gray-200 pb-2 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-users-viewfinder text-emerald-700"></i> C. STATUS AND DEMOGRAPHICS CLASSIFICATION
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">Gender Classification <span class="text-red-500">*</span></label>
+                            <select name="gender_classification" required class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-700">
                                 <option value="">-- Choose Option --</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Local Status Residency *</label>
-                            <input type="text" name="local_residency" required class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">Local Status Residency <span class="text-red-500">*</span></label>
+                            <input type="text" name="local_residency" placeholder="e.g. Quetta Local" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-700 focus:border-transparent transition bg-white text-sm shadow-sm">
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Disability Classification</label>
-                            <select name="disability_status" class="w-full px-4 py-2.5 border border-slate-300 bg-white rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-4">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">Disability Classification</label>
+                            <select name="disability_status" class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-700">
                                 <option value="No">No</option>
                                 <option value="Yes">Yes</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Minority Status Identification</label>
-                            <select name="minority_status" class="w-full px-4 py-2.5 border border-slate-300 bg-white rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm">
-                                <option value="No">No</option>
-                                <option value="Yes">Yes</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECTION D: FINANCIAL DISBURSEMENT ACCOUNTS -->
-                <div class="space-y-4">
-                    <h2 class="text-base font-bold text-[#064e3b] border-b border-slate-200 pb-1 uppercase tracking-wide">D. Financial Disbursement Accounts</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Vendor Identification Number</label>
-                            <input type="text" name="vendor_id" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Bank Account Number (IBAN)</label>
-                            <input type="text" name="bank_iban" placeholder="PKXXBBBBXXXXXXXXXXXXXXXX" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-[#064e3b] focus:outline-none transition shadow-sm bg-slate-50/50">
-                        </div>
-                    </div>
