@@ -5,19 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>National Trainee Enrollment & Registration Portal</title>
     
-    <!-- Native CSS Style Sheet Layout Injection to permanently override any external blocking issues -->
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; padding: 20px; line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
         
-        .portal-wrapper { max-w: 850px; width: 100%; margin: 30px auto; background: #ffffff; border-radius: 12px; shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+        .portal-wrapper { max-w: 850px; width: 100%; margin: 30px auto; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
         
-        .header-banner { background-color: #064e3b; color: #ffffff; padding: 35px 20px; text-align: center; border-bottom: 6px solid #d97706; position: relative; }
-        .header-gov { font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase; tracking: 0.1em; margin-bottom: 4px; }
+        .header-banner { background-color: #064e3b; color: #ffffff; padding: 35px 20px; text-align: center; border-bottom: 6px solid #d97706; }
+        .header-gov { font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase; tracking: 0.1em; margin-bottom: 4px; letter-spacing: 1px; }
         .header-title { font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .header-subtitle { font-size: 13px; color: #a7f3d0; margin-top: 10px; font-weight: 500; }
         
-        .form-body { padding: 40px; }
+        .form-body { padding: 40px; display: block; }
         .form-section { background: #f8fafc; border: 1px solid #e2e8f0; padding: 25px; border-radius: 10px; margin-bottom: 30px; }
         .section-title { font-size: 14px; font-weight: 700; color: #064e3b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 20px; text-transform: uppercase; tracking: 0.5px; }
         
@@ -31,11 +30,11 @@
         .input-control { width: 100%; padding: 11px 16px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; background-color: #ffffff; color: #0f172a; transition: all 0.2s ease; }
         .input-control:focus { outline: none; border-color: #064e3b; box-shadow: 0 0 0 3px rgba(6, 78, 59, 0.15); }
         
-        .submit-btn { width: 100%; padding: 15px; background-color: #064e3b; color: #ffffff; border: none; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; text-transform: uppercase; tracking: 0.5px; transition: background 0.2s ease; margin-top: 10px; box-shadow: 0 4px 6px rgba(6, 78, 59, 0.15); }
+        .submit-btn { width: 100%; padding: 15px; background-color: #064e3b; color: #ffffff; border: none; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; text-transform: uppercase; tracking: 0.5px; transition: background 0.2s ease; margin-top: 10px; box-shadow: 0 4px 6px rgba(6, 78, 59, 0.15); display: block; text-align: center; }
         .submit-btn:hover { background-color: #022c22; }
         .submit-btn:active { transform: scale(0.99); }
         
-        .portal-footer { background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 15px; text-align: center; font-size: 12px; font-weight: 600; color: #64748b; }
+        .portal-footer { background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px; text-align: center; font-size: 12px; font-weight: 600; color: #64748b; margin-top: 20px; }
         .admin-link { color: #064e3b; font-weight: 700; text-decoration: underline; margin-left: 5px; cursor: pointer; background: none; border: none; font-size: 12px; }
         .admin-link:hover { color: #022c22; }
         
@@ -46,14 +45,14 @@
 
     <div class="portal-wrapper">
         
-        <!-- Top Institutional Header -->
+        <!-- Institutional Header Banner -->
         <div class="header-banner">
             <div class="header-gov">Government of Balochistan</div>
             <h1 class="header-title">NATIONAL TRAINEE ENROLLMENT & REGISTRATION PORTAL</h1>
             <p class="header-subtitle">Official Information Management Intake System — Small Industries Wing, Balochistan Portal</p>
         </div>
 
-        <!-- Enrollment Registration Intake Form Module -->
+        <!-- Enrollment Registration Form Structure (All tag tracks completely isolated and closed) -->
         <form action="/submit-enrollment" method="POST" class="form-body">
             
             <!-- A. CENTER ALLOCATION DETAILS -->
@@ -78,6 +77,7 @@
                         <input type="text" name="father_name" required class="input-control">
                     </div>
                 </div>
+                
                 <div class="grid-2" style="margin-top: 15px;">
                     <div class="field-group">
                         <label class="field-label">CNIC Number<span class="required-star">*</span></label>
@@ -88,6 +88,7 @@
                         <input type="text" name="mobile_contact" placeholder="e.g. 03331234567" required class="input-control">
                     </div>
                 </div>
+                
                 <div class="grid-3" style="margin-top: 15px;">
                     <div class="field-group">
                         <label class="field-label">Session Batch Cohort<span class="required-star">*</span></label>
@@ -122,6 +123,7 @@
                         <input type="text" name="local_residency" placeholder="e.g. Quetta Local" required class="input-control">
                     </div>
                 </div>
+                
                 <div class="grid-2" style="margin-top: 15px;">
                     <div class="field-group">
                         <label class="field-label">Disability Classification</label>
