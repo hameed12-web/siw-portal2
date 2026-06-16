@@ -3,151 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Small Industries Wing, Balochistan - Admin Portal</title>
+    <title>Small Industries Wing, Balochistan - Trainee Portal</title>
+    <!-- Core Tailwind CSS Engine CDN Integration with fallback options -->
     <script src="https://tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cloudflare.com">
-</head>
-<body class="bg-gray-50 text-gray-800">
-
-    <!-- Top Admin Banner Bar -->
-    <header class="bg-emerald-900 text-white shadow-lg py-4 px-6 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="p-2.5 bg-amber-500 rounded-lg text-emerald-950 shadow-inner">
-                    <i class="fa-solid fa-gavel text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight">Small Industries Wing</h1>
-                    <p class="text-xs text-amber-400 font-semibold tracking-widest uppercase">Government of Balochistan</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <span class="bg-emerald-800 text-emerald-200 border border-emerald-700/60 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Admin Session Access
-                </span>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <!-- Structural Control Center Panel -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Training Centers Master Database</h2>
-                <p class="text-sm text-gray-500 mt-0.5">Configure provincial centers, DDO codes, execution structures, and data fields.</p>
-            </div>
-            <div class="flex flex-wrap gap-3 w-full md:w-auto">
-                <button onclick="toggleModal('columnModal')" class="flex-1 md:flex-none px-4 py-2.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-emerald-950 font-bold text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-table-columns"></i> Add Extra Column
-                </button>
-                <button onclick="toggleModal('centerModal')" class="flex-1 md:flex-none px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-semibold text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-circle-plus"></i> Register Center
-                </button>
-            </div>
-        </div>
-
-        <!-- Master View Responsive Data Presentation Grid -->
-        <div class="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse" id="managementTable">
-                    <thead>
-                        <tr class="bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
-                            <th class="px-6 py-4">S.No.</th>
-                            <th class="px-6 py-4">DDO Code</th>
-                            <th class="px-6 py-4">Name of Center</th>
-                            <th class="px-6 py-4">Status</th>
-                            <th class="px-6 py-4">Sector Type</th>
-                            <th class="px-6 py-4">DDO Name</th>
-                            <!-- Extended Column Injection Destination -->
-                            <th class="px-6 py-4 text-right" id="actionsColumnHeader">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 text-sm font-medium text-gray-700" id="centersTableBody">
-                        {% for center in centers %}
-                        <tr class="hover:bg-gray-50/80 transition">
-                            <td class="px-6 py-4 font-bold text-gray-400">{{ center.s_no }}</td>
-                            <td class="px-6 py-4"><span class="bg-gray-100 border border-gray-200 font-mono text-xs px-2.5 py-1 rounded-md font-bold text-gray-600">{{ center.ddo_code }}</span></td>
-                            <td class="px-6 py-4 text-emerald-950 font-semibold">{{ center.center_name }}</td>
-                            <td class="px-6 py-4">
-                                <span class="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 w-max {% if center.status == 'Functional' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-rose-50 text-rose-700 border border-rose-200{% endif %}">
-                                    <span class="w-1.5 h-1.5 rounded-full {% if center.status == 'Functional' %}bg-green-500{% else %}bg-rose-500{% endif %}"></span> {{ center.status }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4"><span class="px-2.5 py-0.5 rounded text-xs font-bold {% if center.type == 'Govt' %}bg-blue-50 text-blue-700 border border-blue-100{% else %}bg-purple-50 text-purple-700 border border-purple-100{% endif %} border">{{ center.type }}</span></td>
-                            <td class="px-6 py-4 text-gray-600">{{ center.ddo_name }}</td>
-                            <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                <button class="text-emerald-700 hover:text-emerald-900 transition text-xs"><i class="fa-solid fa-pen-to-square mr-1"></i>Edit</button>
-                                <button class="text-rose-600 hover:text-rose-900 transition text-xs"><i class="fa-solid fa-trash mr-1"></i>Delete</button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
-    <!-- Modal Layout Setup: New Columns Integration Form -->
-    <div id="columnModal" class="fixed inset-0 bg-emerald-950/40 hidden items-center justify-center z-50 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-gray-100">
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Create Custom Data Attribute</h3>
-            <p class="text-xs text-gray-500 mb-4">Dynamically extends database storage attributes and injects structural field updates across all current dataset instances.</p>
-            <input type="text" id="columnInput" placeholder="e.g., District Name, Contact Contact" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none transition mb-4">
-            <div class="flex justify-end gap-2 text-sm font-semibold">
-                <button onclick="toggleModal('columnModal')" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition">Cancel</button>
-                <button onclick="commitExtraColumn()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl transition">Apply Attribute</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Frontend UI Dynamic Interaction Framework Engine -->
     <script>
-        function toggleModal(id) {
-            const modal = document.getElementById(id);
-            if(modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                modal.classList.remove('flex');
-                modal.classList.add('hidden');
+        // Ensure Tailwind config initializes properly even if network constraints limit external components
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: { 850: '#064e3b', 950: '#022c22' }
+                    }
+                }
             }
         }
-
-        function commitExtraColumn() {
-            const label = document.getElementById('columnInput').value.trim();
-            if (!label) return alert("Please specify a functional attribute string key.");
-
-            fetch('/api/columns', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ column_name: label })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    // Update DOM Header View Schema Structure Mapping Interventions
-                    const th = document.createElement('th');
-                    th.className = "px-6 py-4 text-gray-500 text-xs font-bold uppercase tracking-wider bg-gray-50 border-b border-gray-200";
-                    th.innerText = label;
-                    const actionHead = document.getElementById('actionsColumnHeader');
-                    actionHead.parentNode.insertBefore(th, actionHead);
-
-                    // Realign active dataset items row parameters view rendering mappings
-                    const rows = document.querySelectorAll('#centersTableBody tr');
-                    rows.forEach(row => {
-                        const td = document.createElement('td');
-                        td.className = "px-6 py-4 text-gray-400 italic text-xs font-normal";
-                        td.innerText = "Empty Fields Mapping";
-                        row.insertBefore(td, row.cells[row.cells.length - 1]);
-                    });
-
-                    toggleModal('columnModal');
-                    document.getElementById('columnInput').value = '';
-                } else {
-                    alert("Execution Warning: " + data.error);
-                }
-            });
-        }
     </script>
-</body>
-</html>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans antialiased">
+
+    <!-- PUBLIC TRAINEE ENROLLMENT PORTAL VIEW -->
+    <div id="publicPortal" class="block max-w-4xl mx-auto my-8 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+        
+        <!-- Header Banner Section (Matches Mockup 2 Banner Branding) -->
+        <div class="bg-emerald-950 text-white text-center py-8 px-6 border-b-4 border-amber-500">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-wider uppercase">National Trainee Enrollment & Registration Portal</h1>
+            <p class="text-xs sm:text-sm text-amber-400 mt-2 font-medium tracking-wide">
+                Official Information Management Intake System — Small Industries Wing, Balochistan
+            </p>
+        </div>
+
+        <!-- Enrollment Intake Form Context Layout -->
+        <form id="enrollmentForm" class="p-6 sm:p-10 space-y-8" onsubmit="handleFormSubmission(event)">
+            
+            <!-- SECTION A: CENTER ALLOCATION DETAILS -->
+            <div>
+                <h3 class="text-sm font-bold text-emerald-900 border-b border-gray-200 pb-2 mb-4 tracking-wider uppercase">A. Center Allocation Details</h3>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Center / DDO Unit Name</label>
+                    <input type="text" name="center_name" required placeholder="Specify designated training center name" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                </div>
+            </div>
+
+            <!-- SECTION B: PERSONAL PROFILE PARTICULARS -->
+            <div>
+                <h3 class="text-sm font-bold text-emerald-900 border-b border-gray-200 pb-2 mb-4 tracking-wider uppercase">B. Personal Profile Particulars</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Full Name (As per CNIC)</label>
+                        <input type="text" name="full_name" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Father Name</label>
+                        <input type="text" name="father_name" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">CNIC Number</label>
+                        <input type="text" name="cnic" required placeholder="XXXXX-XXXXXXX-X" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm font-mono focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Mobile Contact Number</label>
+                        <input type="text" name="mobile" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Session Batch Cohort</label>
+                        <input type="text" name="batch" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Email Address</label>
+                        <input type="email" name="email" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Assigned Course Module</label>
+                    <input type="text" name="course" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                </div>
+            </div>
+
+            <!-- SECTION C: STATUS AND DEMOGRAPHICS CLASSIFICATION -->
+            <div>
+                <h3 class="text-sm font-bold text-emerald-900 border-b border-gray-200 pb-2 mb-4 tracking-wider uppercase">C. Status and Demographics Classification</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Gender Classification</label>
+                        <select name="gender" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm bg-white focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                            <option value="">-- Choose Option --</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Local Status Residency</label>
+                        <input type="text" name="residency" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Disability Classification</label>
+                        <select name="disability" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm bg-white focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Minority Status Identification</label>
+                        <select name="minority" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm bg-white focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION D: FINANCIAL DISBURSEMENT ACCOUNTS -->
+            <div>
+                <h3 class="text-sm font-bold text-emerald-900 border-b border-gray-200 pb-2 mb-4 tracking-wider uppercase">D. Financial Disbursement Accounts</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Vendor Identification Number</label>
+                        <input type="text" name="vendor_id" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Bank Account Number (IBAN)</label>
+                        <input type="text" name="iban" placeholder="PKXXBBBBXXXXXXXXXXXXXXXX" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm font-mono focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Monthly Stipend Allowance (Rs.)</label>
+                        <input type="number" name="stipend" placeholder="e.g. 5000" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Easypaisa / Omni / Mobi Cash Account Number</label>
+                        <input type="text" name="mobile_wallet" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-800 focus:outline-none transition">
+                    </div>
+                </div>
+            </div>
+
