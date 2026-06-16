@@ -3,148 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Small Industries Wing, Balochistan</title>
-    <style>
-        :root { --primary: #065f46; --primary-dark: #064e3b; --secondary: #1e293b; --bg: #f8fafc; --card-bg: #ffffff; --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
-        header { background-color: var(--primary); color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary-dark); }
-        .brand-title { font-size: 24px; font-weight: 800; }
-        .brand-sub { font-size: 13px; color: #a7f3d0; margin-top: 2px; }
-        .nav-container { max-w: 1200px; margin: 25px auto 0 auto; padding: 0 20px; display: flex; gap: 12px; border-bottom: 2px solid var(--border); }
-        .tab-btn { padding: 12px 20px; font-size: 14px; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--text-muted); border-bottom: 3px solid transparent; }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
-        main { max-w: 1200px; margin: 0 auto; padding: 20px; }
-        .dashboard-section { display: none; }
-        .dashboard-section.active { display: block; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px; }
-        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; color: var(--secondary); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 12px; font-weight: 700; color: #475569; }
-        input, select { padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
-        .btn { padding: 10px 20px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; border: none; background-color: var(--primary); color: white; display: inline-flex; align-items: center; justify-content: center; }
-        .btn:hover { background-color: var(--primary-dark); }
-        table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px; font-size: 14px; }
-        th { background-color: #f1f5f9; color: #475569; font-weight: 700; padding: 12px 16px; border-bottom: 1px solid var(--border); }
-        td { padding: 14px 16px; border-bottom: 1px solid var(--border); }
-        .badge { padding: 4px 8px; font-size: 11px; font-weight: 700; border-radius: 50px; text-transform: uppercase; }
-        .badge-success { background-color: #dcfce7; color: #166534; }
-        .badge-info { background-color: #e0f2fe; color: #0369a1; }
-        .flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    </style>
+    <title>Small Industries Wing, Balochistan - Admin Portal</title>
+    <script src="https://tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cloudflare.com">
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800">
 
-    <header>
-        <div>
-            <div class="brand-title">Small Industries Wing, Balochistan</div>
-            <div class="brand-sub">Government of Balochistan — Management Information Portal</div>
-        </div>
-        <div>
-            {% if current_role != 'public' %}
-                <span class="badge badge-success" style="padding:10px;">🟢 SESSION: {{ current_role|upper }} ({{ user_ddo }})</span>
-                <a href="/logout" class="btn" style="background:#475569; margin-left:10px; padding:6px 12px; font-size:12px; text-decoration:none;">Logout</a>
-            {% else %}
-                <span class="badge" style="background:#475569; color:white; padding:10px;">🌐 PUBLIC ACCESS</span>
-            {% endif %}
+    <!-- Top Admin Banner Bar -->
+    <header class="bg-emerald-900 text-white shadow-lg py-4 px-6 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-amber-500 rounded-lg text-emerald-950 shadow-inner">
+                    <i class="fa-solid fa-gavel text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Small Industries Wing</h1>
+                    <p class="text-xs text-amber-400 font-semibold tracking-widest uppercase">Government of Balochistan</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="bg-emerald-800 text-emerald-200 border border-emerald-700/60 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Admin Session Access
+                </span>
+            </div>
         </div>
     </header>
 
-    <div class="nav-container">
-        <button class="tab-btn active" onclick="switchTab('public-tab', this)">🏛️ Public Enrollment & Verification</button>
-        {% if current_role in ['admin', 'ddo'] %}
-            <button class="tab-btn" onclick="switchTab('centers-tab', this)">🏫 Centers & DDO Registry</button>
-            <button class="tab-btn" onclick="switchTab('docs-tab', this)">📂 Official Documents Tracking</button>
-        {% endif %}
-    </div>
-
-    <main>
-        <!-- TAB 1: PUBLIC INTERFACE -->
-        <div id="public-tab" class="dashboard-section active">
-            <!-- Trainee Enrollment Module -->
-            <div class="card">
-                <div class="card-title">📝 Public Trainee Online Registration Form</div>
-                <form action="/public-enroll" method="POST">
-                    <div class="form-grid">
-                        <div class="form-group"><label>Full Name</label><input type="text" name="name" required /></div>
-                        <div class="form-group"><label>Father Name</label><input type="text" name="father_name" required /></div>
-                        <div class="form-group"><label>CNIC / B-Form</label><input type="text" name="cnic" placeholder="61101-xxxxxxx-x" required /></div>
-                        <div class="form-group"><label>Select Trade</label><input type="text" name="trade" placeholder="e.g. Technical Welding" required /></div>
-                        <div class="form-group">
-                            <label>Target Center DDO Code</label>
-                            <select name="ddo_code" required>
-                                {% for center in centers %}<option value="{{ center.ddo_code }}">{{ center.center_name }} ({{ center.ddo_code }})</option>{% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div style="margin-top:15px; display:flex; justify-content:flex-end;"><button type="submit" class="btn">Submit Enrollment</button></div>
-                </form>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- Structural Control Center Panel -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Training Centers Master Database</h2>
+                <p class="text-sm text-gray-500 mt-0.5">Configure provincial centers, DDO codes, execution structures, and data fields.</p>
             </div>
-
-            <!-- Gatekeep Access Component Box directly below Form -->
-            {% if current_role == 'public' %}
-            <div class="card" style="background: #f1f5f9; border: 2px solid #cbd5e1;">
-                <div class="card-title">🔒 Secure Official Access / DDO Login</div>
-                <form action="/login" method="POST" style="display:flex; gap:15px; align-items:flex-end;">
-                    <div class="form-group" style="flex:1;"><label>Username / DDO ID</label><input type="text" name="username" placeholder="admin OR ddo_QA01" required /></div>
-                    <div class="form-group" style="flex:1;"><label>Account Password</label><input type="password" name="password" placeholder="••••••••" required /></div>
-                    <button type="submit" class="btn" style="height:42px; background:#1e293b;">Verify & Sign In</button>
-                </form>
-            </div>
-            {% endif %}
-
-            <!-- Public Trainees List with system Special IDs -->
-            <div class="card">
-                <div class="card-title">👥 Registered Trainees Reference Directory</div>
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                            <tr><th>Special ID</th><th>Name</th><th>Trade Course</th><th>Assigned DDO Node</th></tr>
-                        </thead>
-                        <tbody>
-                            {% for t in trainees %}
-                            {% if current_role == 'admin' or current_role == 'public' or user_ddo == t.ddo_code %}
-                            <tr>
-                                <td style="font-family:monospace; font-weight:700; color:var(--primary);">{{ t.special_id }}</td>
-                                <td><strong>{{ t.name }}</strong></td>
-                                <td>{{ t.trade }}</td>
-                                <td><span class="badge badge-info">{{ t.ddo_code }}</span></td>
-                            </tr>
-                            {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="flex flex-wrap gap-3 w-full md:w-auto">
+                <button onclick="toggleModal('columnModal')" class="flex-1 md:flex-none px-4 py-2.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-emerald-950 font-bold text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-table-columns"></i> Add Extra Column
+                </button>
+                <button onclick="toggleModal('centerModal')" class="flex-1 md:flex-none px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-semibold text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-circle-plus"></i> Register Center
+                </button>
             </div>
         </div>
 
-        <!-- TAB 2: ADMINISTRATIONAL CENTERS WORKSPACE -->
-        <div id="centers-tab" class="dashboard-section">
-            <div class="card">
-                <div class="flex-header">
-                    <div class="card-title" style="margin:0;">Institutional Map Framework</div>
-                    {% if current_role == 'admin' %}
-                    <form action="/add-column" method="POST" class="form-inline" style="display:flex; gap:10px;">
-                        <input type="text" name="column_name" placeholder="New Column Label..." required />
-                        <button type="submit" class="btn">+ Add Column</button>
-                    </form>
-                    {% endif %}
-                </div>
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                {% for col in columns %}<th>{{ col }}</th>{% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for center in centers %}
-                            {% if current_role == 'admin' or user_ddo == center.ddo_code %}
-                            <tr>
-                                <td>{{ center.s_no }}</td>
-                                <td style="font-family:monospace; font-weight:700;">{{ center.ddo_code }}</td>
-                                <td><strong>{{ center.center_name }}</strong></td>
-                                <td>{{ center.status }}</td>
-                                <td>{{ center.governance_type }}</td>
-                                <td>{{ center.ddo_name }}</td>
+        <!-- Master View Responsive Data Presentation Grid -->
+        <div class="bg-white rounded-2xl border border-gray-200/90 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse" id="managementTable">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
+                            <th class="px-6 py-4">S.No.</th>
+                            <th class="px-6 py-4">DDO Code</th>
+                            <th class="px-6 py-4">Name of Center</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Sector Type</th>
+                            <th class="px-6 py-4">DDO Name</th>
+                            <!-- Extended Column Injection Destination -->
+                            <th class="px-6 py-4 text-right" id="actionsColumnHeader">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-sm font-medium text-gray-700" id="centersTableBody">
+                        {% for center in centers %}
+                        <tr class="hover:bg-gray-50/80 transition">
+                            <td class="px-6 py-4 font-bold text-gray-400">{{ center.s_no }}</td>
+                            <td class="px-6 py-4"><span class="bg-gray-100 border border-gray-200 font-mono text-xs px-2.5 py-1 rounded-md font-bold text-gray-600">{{ center.ddo_code }}</span></td>
+                            <td class="px-6 py-4 text-emerald-950 font-semibold">{{ center.center_name }}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 w-max {% if center.status == 'Functional' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-rose-50 text-rose-700 border border-rose-200{% endif %}">
+                                    <span class="w-1.5 h-1.5 rounded-full {% if center.status == 'Functional' %}bg-green-500{% else %}bg-rose-500{% endif %}"></span> {{ center.status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4"><span class="px-2.5 py-0.5 rounded text-xs font-bold {% if center.type == 'Govt' %}bg-blue-50 text-blue-700 border border-blue-100{% else %}bg-purple-50 text-purple-700 border border-purple-100{% endif %} border">{{ center.type }}</span></td>
+                            <td class="px-6 py-4 text-gray-600">{{ center.ddo_name }}</td>
+                            <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                                <button class="text-emerald-700 hover:text-emerald-900 transition text-xs"><i class="fa-solid fa-pen-to-square mr-1"></i>Edit</button>
+                                <button class="text-rose-600 hover:text-rose-900 transition text-xs"><i class="fa-solid fa-trash mr-1"></i>Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Layout Setup: New Columns Integration Form -->
+    <div id="columnModal" class="fixed inset-0 bg-emerald-950/40 hidden items-center justify-center z-50 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-gray-100">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Create Custom Data Attribute</h3>
+            <p class="text-xs text-gray-500 mb-4">Dynamically extends database storage attributes and injects structural field updates across all current dataset instances.</p>
+            <input type="text" id="columnInput" placeholder="e.g., District Name, Contact Contact" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none transition mb-4">
+            <div class="flex justify-end gap-2 text-sm font-semibold">
+                <button onclick="toggleModal('columnModal')" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition">Cancel</button>
+                <button onclick="commitExtraColumn()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-emerald-950 rounded-xl transition">Apply Attribute</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frontend UI Dynamic Interaction Framework Engine -->
+    <script>
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            if(modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function commitExtraColumn() {
+            const label = document.getElementById('columnInput').value.trim();
+            if (!label) return alert("Please specify a functional attribute string key.");
+
+            fetch('/api/columns', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ column_name: label })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    // Update DOM Header View Schema Structure Mapping Interventions
+                    const th = document.createElement('th');
+                    th.className = "px-6 py-4 text-gray-500 text-xs font-bold uppercase tracking-wider bg-gray-50 border-b border-gray-200";
+                    th.innerText = label;
+                    const actionHead = document.getElementById('actionsColumnHeader');
+                    actionHead.parentNode.insertBefore(th, actionHead);
+
+                    // Realign active dataset items row parameters view rendering mappings
+                    const rows = document.querySelectorAll('#centersTableBody tr');
+                    rows.forEach(row => {
+                        const td = document.createElement('td');
+                        td.className = "px-6 py-4 text-gray-400 italic text-xs font-normal";
+                        td.innerText = "Empty Fields Mapping";
+                        row.insertBefore(td, row.cells[row.cells.length - 1]);
+                    });
+
+                    toggleModal('columnModal');
+                    document.getElementById('columnInput').value = '';
+                } else {
+                    alert("Execution Warning: " + data.error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
